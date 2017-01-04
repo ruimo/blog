@@ -1,0 +1,102 @@
+@import java.time.format.DateTimeFormatter
+@import java.time.LocalDateTime
+@import play.api.i18n.{Messages => msg}
+@import scala.collection.{immutable => imm}
+
+@(
+  recs: PagedRecords[(Article, imm.Seq[Comment])],
+  publishDateFormatter: DateTimeFormatter,
+  toLocalDateTime: Long => LocalDateTime,
+  commentForm: Form[Comment]
+)(
+  implicit messagesApi: msg,
+  request: RequestHeader,
+  flash: Flash,
+  loginBlogger: Option[LoginBlogger]
+)
+
+@main(messagesApi("top"), loginBlogger) {
+  <script src="@routes.Assets.versioned("javascripts/index.js")"></script>
+  <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/index.css")">
+} {
+  @helper.form(action = helper.CSRF(routes.ArticleController.remove()), 'id -> "removeArticleForm") {
+    <input type="hidden" class="id" name="id" value="">
+  }
+
+  @helper.form(action = helper.CSRF(routes.ArticleController.removeComment()), 'id -> "removeCommentForm") {
+    <input type="hidden" class="id" name="id" value="">
+  }
+
+  @if(recs.isEmpty) {
+    <div class="recordEmpty">
+      @messagesApi("recordEmpty")
+    </div>
+  } else {
+    @recs.records.map { case (article, comments) =>
+      <div class="article">
+        <div class="titleBar">
+          <div class="id">
+            #@article.id.value
+          </div>
+          <div class="title">
+            @article.title
+          </div>
+          <div class="rightPane">
+            <div class="publishDate">
+              @publishDateFormatter.format(toLocalDateTime(article.publishTime))
+            </div>
+            @if(loginBlogger.isDefined) {
+              <div class="edit">
+                <button type="button" class="button" onclick="location.href='@routes.ArticleController.updateStart(article.id.value);'">
+                  @msg("edit")
+                </button>
+              </div>
+              <div class="remove">
+                <button type="button" class="button" onclick='removeArticle(@article.id.value, "@msg("deleteConfirm")", "@msg("yes")", "@msg("no")");'>@msg("remove")</button>
+              </div>
+            }
+          </div>
+          <div class="eol"></div>
+        </div>
+        <div class="body">@Html(article.body)</div>
+        <div class="commentArea">
+          <div class="comments">
+            @comments.map { c =>
+              <div class="titleBar @if(!c.authorized) {waitingAuthorization} else {}">
+                <div class="name">
+                  @c.name.getOrElse(msg("anonymous"))
+                </div>
+                @if(!c.authorized) {<span class="body">@msg("waitingAuthorization")</span>} else {}
+                <div class="rightPane">
+                  <div class="publishDate">
+                    @publishDateFormatter.format(toLocalDateTime(c.createdTime))
+                  </div>
+                  @if(loginBlogger.isDefined) {
+                    @if(!c.authorized) {
+                      @helper.form(action = helper.CSRF(routes.ArticleController.authorizeComment()), 'class -> "authorizeCommentForm") {
+                        <input type="hidden" class="id" name="id" value="@c.id.get.value">
+                        <input type="submit" value="@msg("authorize")">
+                      }
+                    }
+                    <button type="button" class="button" onclick='removeComment(@c.id.get.value, "@msg("deleteCommentConfirm")", "@msg("yes")", "@msg("no")");'>@msg("remove")</button>
+                  }
+                </div>
+                <div class="eol"></div>
+              </div>
+              <div id="bodyWrapper@c.id.get.value" class="@if(!c.authorized) {waitingAuthorization} else {}">
+                @if(c.authorized || loginBlogger.isDefined) {
+                  <pre class="body">@c.body</pre>
+                }
+              </div>
+          }
+          </div>
+          <div id="commentEntry@article.id.value" class="commentEntry">
+            @commentEntry(article.id, commentForm)
+          </div>
+        </div>
+      </div>
+    }
+  }
+
+  <div id="removeDialog"></div>
+}

@@ -1,0 +1,94 @@
+dd.error {
+    color: red;
+    font-weight: bold;
+}
+
+dl.error {
+    background-color: MistyRose;
+}
+
+form dl dt {
+    margin: 3px;
+    background-color: Honeydew;
+    padding: 3px;
+}
+
+.fileDragDropArea,#fileTable {
+    width: 100%;
+    padding: 4px;
+    margin: 10px;
+}
+
+.fileDragDropArea {
+    border: solid 1px;
+    min-height: 5em;
+}
+
+.header {
+    width: 100%;
+}
+
+.logo {
+    float: left;
+}
+
+.adminMenu {
+    float: right;
+}
+
+.createArticleLink {
+    display: inline-block;
+}
+
+.loginPanel {
+    display: inline-block;
+}
+
+.article {
+    margin: 10px;
+    background: MintCream;
+    padding: 12px;
+    box-shadow: 5px 5px 10px;
+}
+
+.article .titleBar {
+    margin: 3px;
+    padding: 6px;
+    background-color: MidnightBlue;
+    color: White;
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+}
+
+.titleBar.waitingAuthorization {
+    background-color: DarkOrange;
+}
+
+.waitingAuthorization {
+    background-color: Moccasin;
+}
+
+.titleBar .id,.title,.name {
+    float: left;
+    padding-right: 1em;
+}
+
+.titleBar .rightPane {
+    display: inline-flex;
+    float: right;
+}
+
+.titleBar .rightPane .publishDate,.edit,.remove {
+    display: inline-block;
+}
+
+.titleBar .eol {
+    clear: both;
+}
+
+.article .body {
+    margin: 8px;
+    padding: 3px;
+}
+

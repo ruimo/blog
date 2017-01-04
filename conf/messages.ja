@@ -1,0 +1,86 @@
+# --- Constraints
+constraint.required=(必須)
+constraint.min=最小値は {0} です。
+constraint.max=最大値は {0} です
+constraint.minLength=最小の長さは {0} です。
+constraint.maxLength=最大の長さは {0} です。
+constraint.validatewith=
+constraint.password.char=パスワードは、アルファベット、数字、記号で指定してください
+
+# --- Formats
+format.date=Date (''{0}'')
+format.numeric=数値で指定してください
+format.real=Real
+
+# --- Errors
+# 句点を最後に入れないこと。複数のエラーがある時、カンマ区切りで表示されるので不自然になる。
+error.pasword.char=アルファベット、数字、記号以外の文字は使用できません
+error.invalid=値が不適切です
+error.required=入力必須です
+error.number=数値を入力してください
+error.real=数値を入力してください
+error.real.precision=Real number value with no more than {0} digit(s) including {1} decimal(s) expected
+error.min={0} 以上の値を入力してください
+error.min.strict={0} より大きな値を入力してください
+error.max={0} 以下の値を入力してください
+error.max.strict={0} より小さな値を入力してください
+error.minLength=最小長さは {0} です
+error.maxLength=最大長さは {0} です
+error.email=正しいメールアドレスを入力してください
+error.pattern=次のパターンに従う必要があります {0}
+error.invalid.yyyymmdd=YYYYMMDDの形式で入力してください
+error.value=値が不適切です
+
+createArticleTitle=記事の作成
+saveArticle=保存
+createArticle=完了
+title=タイトル
+body=ボディ
+publishTime=公開日
+dragDropFiles=添付ファイルがある場合は、ここにドラッグアンドドロップしてください
+checkLogFileForAdminPassword=ログファイルを見てパスワードを入力してください。
+bloggerName=ブロガー名
+password=パスワード
+back=戻る
+logoff=ログオフ
+login=ログイン
+createArticle=記事の作成
+created={0} が作成されました。
+update={0} が更新されました。
+removed={0} が削除されました。
+article=記事
+nameAndPasswordNotMatched=ブロガー名とパスワードが合っていません。
+recordEmpty=レコードがありません。
+deleteConfirm=この記事を削除して良いですか？
+remove=削除
+yes=はい
+no=いいえ
+unknownError=ただいま混雑しています。少し時間をあけて再度お試しください。
+edit=編集
+updateArticleTitle=記事の更新
+create=作成
+file=ファイル
+noSupportDragDrop=ドラッグドロップによるファイル選択は、このブラウザでは利用できません。
+selectFiles=アップロードしたいファイルをここにドラッグドロップするか、ここをクリックして追加してください。
+abort=中止
+pause=保留
+resume=再開
+restart=再実行
+uploadErrorTooBig=ファイルが大きすぎます。
+uploadErrorUnknown=原因不明のエラーです。サーバーログを確認してください。
+fileUpload=ファイルのアップロード
+courtegyName=お名前
+comment=コメント
+postComment=コメント
+updateArticle=更新
+waitingAuthorization=承認待ち
+commentAuthorized=コメントが承認されました。
+authorize=承認
+deleteCommentConfirm=このコメントを削除して良いですか？
+changePasswordTitle=パスワードの変更
+confirmPasswordDoesNotMatch=確認用パスワードが合っていません。
+currentPassword=現在のパスワード
+newPasswords.main=新しいパスワード
+newPasswords.confirm=新しいパスワード(確認)
+paswordChanged=パスワードが変更されました。
+passwordDoesnotMatch=現在のパスワードが合っていません。

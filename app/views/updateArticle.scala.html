@@ -1,0 +1,26 @@
+@import play.api.i18n.{Messages => msg}
+
+@(
+  id: Long,
+  myForm: Form[Article]
+)(
+  implicit messagesApi: msg,
+  loginBlogger: Option[LoginBlogger],
+  request: RequestHeader,
+  flash: Flash
+)
+
+@import helper._
+
+@main(messagesApi("updateArticleTitle"), loginBlogger) {
+  <script src="@routes.Assets.versioned("javascripts/article.js")"></script>
+} {
+  <h1>@Messages("updateArticleTitle")</h1>
+
+  @articleForm(id, myForm, routes.ArticleController.update)
+
+  <button type="button" value="@msg("create")" onclick="submitArticle($('#articleForm').get()[0]);" id="submitButton">
+    @Messages("updateArticle")
+  </button>
+}
+

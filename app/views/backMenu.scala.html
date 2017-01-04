@@ -1,0 +1,9 @@
+@()(
+  implicit messagesApi: play.api.i18n.Messages
+)
+
+<div class="backLinkWrapper">
+  <div class="backLink">
+    <a href="@routes.HomeController.index()">@Messages("back", Messages("top"))</a>
+  </div>
+</div>

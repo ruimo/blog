@@ -1,0 +1,69 @@
+.button {
+    -moz-appearance: button;
+    /* Firefox */
+    -webkit-appearance: button;
+    /* Safari and Chrome */
+    padding: 10px;
+    margin: 10px;
+}
+
+.drop-box {
+    background: #F8F8F8;
+    text-align: center;
+    width: 100%;
+    mi1n-height: 100%;
+}
+
+.dragover {
+    border: 1px dashed blue;
+}
+
+.resizeFrame {
+    display: flex;
+    min-height: 100px;
+    padding: 10px;
+    resize: both;
+    overflow: auto;
+    border: 5px dashed #DDD;
+}
+
+.progress {
+    display: inline-block;
+    width: 80px;
+    border: solid blue 1px;
+}
+
+.progress-bar {
+    display: inline-block;
+    background: blue;
+    color: Aquamarine;
+}
+
+.uploadStatus {
+    padding: 6px;
+}
+
+.thumbnail {
+    max-width: 64px;
+    max-height: 64px;
+    vertical-align: bottom;
+}
+
+.thumbnail-wrapper {
+    min-width: 64px;
+    display: inline-block;
+}
+
+.storedFilesWrapper {
+    display: flex;
+    min-height: 100px;
+    padding: 10px;
+    resize: both;
+    overflow: hidden;
+}
+
+#storedFiles {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}

@@ -1,0 +1,22 @@
+.commentArea {
+  margin-left: 30px;
+  background: LightCyan;
+  padding: 1px;
+}
+
+.commentEntry {
+  padding-top: 4px;
+  background: White;
+}
+
+.commentEntry dt {
+  display: none;
+}
+
+dl {
+  margin: 4px;
+}
+
+.commentEntry textarea {
+  margin: 2px;
+}

@@ -1,0 +1,48 @@
+@import scala.collection.{immutable => imm}
+
+@(
+  recs: PagedRecords[Article],
+  settings: Settings
+)
+
+@dateTime(epochMilli: Long) = @{
+  String.format(
+    "%1$tY-%1$tm-%1$tdT%1$tH:%1$tm:%1$tS%1$tZ",
+    java.time.Instant.ofEpochMilli(epochMilli).atOffset(java.time.ZoneOffset.UTC)
+  )
+}
+
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <id>www.ruimo.com</id>
+  <title>@settings.SiteTitle</title>
+  <link rel="alternate" type="text/html" href="@settings.SiteLink"/>
+  <link rel="self" type="application/atom+xml" href="@settings.SiteLink/atom.xml"/>
+  @recs.records.headOption.map { head =>
+    <updated>@dateTime(head.publishTime)</updated>
+  }
+  <author>
+    <name>@settings.Author</name>
+  </author>
+
+  @settings.SiteLogo.map {logo => <logo>@logo</logo>}
+
+  @settings.SiteSubTitle.map {t => <subtitle>@t</subtitle>}
+
+  <rights>@settings.Author</rights>
+
+  @recs.records.map { e =>
+    <entry>
+      <title>@e.title</title>
+      <link rel="alternate" type="text/html" href="@settings.SiteLink@routes.HomeController.fromId(e.id.value)"/>
+      <author>
+        <name>@settings.Author</name>
+      </author>
+      <id>@settings.SiteLink@routes.HomeController.fromId(e.id.value)</id>
+      <updated>@dateTime(e.updatedTime)</updated>
+      <published>@dateTime(e.publishTime)</published>
+      <content type="html">
+        @e.body
+      </content>
+    </entry>
+  }
+</feed>

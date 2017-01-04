@@ -1,0 +1,52 @@
+@import java.time.format.DateTimeFormatter
+@import java.time.LocalDateTime
+@import play.api.i18n.{Messages => msg}
+
+@(
+  recs: PagedRecords[Image],
+  imageDateFormatter: DateTimeFormatter,
+  toLocalDateTime: Long => LocalDateTime
+)(
+  implicit messagesApi: msg,
+  request: RequestHeader,
+  flash: Flash,
+  loginBlogger: Option[LoginBlogger]
+)
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>
+    <script src="@routes.Assets.versioned("javascripts/clipboard.js-master/dist/clipboard.min.js")"></script>
+    <link rel="stylesheet" type="text/css" href="@routes.Assets.versioned("stylesheets/fileList.css")"/>
+    <link rel="stylesheet" media="screen" href="http://code.jquery.com/ui/1.12.1/themes/redmond/jquery-ui.css">
+  </head>
+  <body>
+    <div class="fileList">
+      @if(recs.isEmpty) {
+        @messagesApi("recordEmpty")
+      } else {
+        <table class="fileListTable">
+          @recs.records.map { rec =>
+            <tr class="row">
+              <td class="thumbnailImg"><img src="@routes.FileController.getImage(rec.id.get.value, true)"></td>
+              <td class="fileName">@rec.fileName</td>
+              <td class="createdTime">@imageDateFormatter.format(toLocalDateTime(rec.createdTime))</td>
+              <td class="link">
+                <span id="url@rec.id.get.value">&lt;img src="@routes.FileController.getImage(rec.id.get.value)"&gt;</span>
+                <button class="copyBtn" data-clipboard-target="#url@rec.id.get.value">@msg("copyToClipboard")</button>
+              </td>
+            </tr>
+          }
+        </table>
+      }
+    </div>
+    <script>
+      $(function() {
+        var clip = new Clipboard('.copyBtn');
+        $("button,input[type='button'],input[type='submit']").button();
+      });
+    </script>
+  </body>
+</html>

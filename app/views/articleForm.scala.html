@@ -1,0 +1,20 @@
+@import play.api.i18n.{Messages => msg}
+
+@(
+  id: Long,
+  myForm: Form[Article],
+  action: Long => play.api.mvc.Call
+)(
+  implicit messagesApi: msg,
+  request: RequestHeader,
+  flash: Flash,
+  loginBlogger: Option[LoginBlogger]
+)
+
+@import helper._
+
+@form(action = CSRF(action(id)), 'id -> "articleForm") {
+  @inputText(myForm("title"), 'size -> 100)
+  @textarea(myForm("body"), 'rows -> 20, 'cols -> 80)
+  @inputText(myForm("publishTime"), 'class -> "dateTime", '_showConstraints -> false)
+}

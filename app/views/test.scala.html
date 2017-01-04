@@ -1,0 +1,17 @@
+@import play.api.i18n.{Messages => msg}
+
+@(
+)(
+  implicit messagesApi: msg,
+  request: RequestHeader,
+  flash: Flash,
+  loginBlogger: Option[LoginBlogger]
+)
+
+@import helper._
+
+@form(action = CSRF(routes.FileController.testPost), 'enctype -> "multipart/form-data") {
+  <input type="file" name="file">
+  <input type="submit">
+}
+

@@ -1,0 +1,80 @@
+@import play.api.i18n.{Messages => msg}
+
+@(
+  title: String, loginBlogger: Option[LoginBlogger]
+)(
+  header: Html
+)(
+  content: Html
+)(
+  implicit messagesApi: msg,
+  request: RequestHeader,
+  flash: Flash
+)
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>@title</title>
+    <link rel="stylesheet" type="text/css"
+          href="@routes.Assets.versioned("javascripts/datetimepicker/build/jquery.datetimepicker.min.css")"/ >
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>
+    <script src="@routes.Assets.versioned("javascripts/datetimepicker/build/jquery.datetimepicker.full.min.js")"></script>
+    <script src="@routes.Assets.versioned("javascripts/jstz.min.js")"></script>
+    <script src="@routes.Assets.versioned("javascripts/jquery.cookie.js")"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.js"></script>
+    <script src="@routes.Assets.versioned("javascripts/clipboard.js-master/dist/clipboard.min.js")"></script>
+    <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
+    <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
+    <link rel="stylesheet" media="screen" href="http://code.jquery.com/ui/1.12.1/themes/redmond/jquery-ui.css">
+    @header
+  </head>
+  <body>
+    <div class="header">
+      <div class="logo">
+        <a href="/"><img src="@routes.Assets.versioned("images/logo.gif")"></a>
+      </div>
+      <div class="adminMenu">
+        @loginBlogger.map { blogger =>
+          <a href="@routes.FileController.index()" class="fileUpload menuLink">@msg("fileUpload")</a>
+          <a href="@routes.ArticleController.startCreate()" class="createArticle menuLink">@msg("createArticle")</a>
+        }.getOrElse("")
+  
+        <div class="loginPanel">
+          @loginBlogger match {
+            case None => {
+              <button type="button" class="button"
+                      onclick='location.href="@routes.BloggerController.startLogin("/")"'>
+                @Messages("login")
+              </button>
+            }
+            case Some(blogger) => {
+              <span>@blogger.blogger.name</span>
+              @helper.form(action = helper.CSRF(routes.BloggerController.logoff()), 'id -> "logoffForm") {
+                <input type="submit" value='@Messages("logoff")' class="button">
+              }
+            }
+          }
+        </div>
+      </div>
+      <div style="clear:both;"></div>
+    </div>
+    <div class="main">
+      @flash.get("message").map { msg =>
+        <div class="message">@msg</div>
+      }
+
+      @content
+    </div>
+    <div class="trailer">
+    </div>
+
+    <script>
+$(function() {
+  $.cookie('tz', jstz.determine().name());
+  $("button,input[type='button'],input[type='submit']").button();
+});
+    </script>
+  </body>
+</html>

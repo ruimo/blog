@@ -1,0 +1,63 @@
+@import play.api.i18n.{Messages => msg}
+
+@(
+  page: Int, pageSize: Int, orderBySpec: String
+)(
+  implicit messagesApi: msg,
+  request: RequestHeader,
+  flash: Flash,
+  loginBlogger: Option[LoginBlogger]
+)
+
+@main(messagesApi("file"), loginBlogger) {
+  <script src="@routes.Assets.versioned("javascripts/ng-file-upload-bower-12.2.13/ng-file-upload-all.min.js")"></script>
+  <script src="@routes.Assets.versioned("javascripts/file.js")"></script>
+  <link rel="stylesheet" type="text/css" href="@routes.Assets.versioned("stylesheets/file.css")"/>
+} {
+<div ng-app="fileUpload" ng-controller="MyCtrl">
+  <div class="resizeFrame">
+    <div ngf-drop ngf-select ng-model="files" class="drop-box" 
+         ngf-drag-over-class="'dragover'" ngf-multiple="true" ngf-allow-dir="true"
+         >@messagesApi("selectFiles")</div>
+  </div>
+  <div ngf-no-file-drop>@messagesApi("noSupportDragDrop")</div>
+  <ul>
+    <li ng-repeat="f in allUploadFiles" class="uploadStatus" ng-show="! f.stored">
+      <div class="thumbnail-wrapper">
+        <img ngf-thumbnail="!f.$error && f" class="thumbnail">
+      </div>
+      <span class="progress" ng-show="f.progress >= 0">
+        <div class="progress-bar" style="width:{{f.progress}}%" ng-bind="f.progress + '%'"></div>
+      </span>
+      <button class="button" ng-click="f.upload.abort();f.upload.aborted=true"
+              ng-show="f.upload != null && f.progress < 100 && !f.upload.aborted">
+        @msg("abort")
+      </button>
+      {{f.name}} {{uploadErrorMsg[f.$error]}}
+    </li>
+  </ul>
+  <table>
+    <tr ng-repeat="f in allFiles" class="fileRow">
+      <td ng-bind="f.fileName"></td>
+    </tr>
+  </table>
+
+  <div class="storedFilesWrapper">
+    <iframe id="storedFiles" src="@routes.FileController.fileList(page, pageSize, orderBySpec)"></iframe>
+  </div>
+</div>
+
+@helper.javascriptRouter("jsRoutes")(
+  routes.javascript.FileController.create
+)
+
+<script>
+  var uploadErrorMsg = {
+    "Unknown": "@msg("uploadErrorUnknown")",
+    "TooBig": "@msg("uploadErrorTooBig")"
+  };
+  app.run(['$rootScope', function($rootScope) {
+    $rootScope.routes = jsRoutes;
+  }]);
+</script>
+}
