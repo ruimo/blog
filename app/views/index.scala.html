@@ -96,6 +96,14 @@
         </div>
       </div>
     }
+    <div class="pageControl">
+      <button class="button" type="button" onclick="location.href='@routes.HomeController.index(recs.currentPage - 1, recs.pageSize, recs.orderBy.toString)';" @if(! recs.prevPageExists) {disabled}> &#x25C0; </button>
+  
+      <span class="pageLocation">@{recs.currentPage + 1} / @{recs.pageCount}</span>
+  
+      <button class="button" type="button" onclick="location.href='@routes.HomeController.index(recs.currentPage + 1, recs.pageSize, recs.orderBy.toString)';" @if(! recs.nextPageExists) {disabled}> &#x25B6; </button>
+    </div>
+    <div style="clear:both;">
   }
 
   <div id="removeDialog"></div>

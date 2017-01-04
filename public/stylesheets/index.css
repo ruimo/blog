@@ -20,3 +20,7 @@ dl {
 .commentEntry textarea {
   margin: 2px;
 }
+
+.pageControl {
+    float: right;
+}
