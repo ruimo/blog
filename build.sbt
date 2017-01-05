@@ -19,6 +19,7 @@ libraryDependencies ++= Seq(
   "com.ruimo" %% "scoins" % "1.7-SNAPSHOT",
   "com.h2database"  %  "h2" % "1.4.193",
   "com.typesafe.play" %% "anorm" % "2.5.0",
+  "com.typesafe.play" %% "play-mailer" % "5.0.0",
   specs2 % Test,
   "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % Test
 )

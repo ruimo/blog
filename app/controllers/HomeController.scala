@@ -1,12 +1,17 @@
 package controllers
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
+import akka.actor.ActorSystem
+import play.api.libs.mailer._
+import java.io.File
 import play.api.libs.json.{Json, JsString}
 import play.api.data._
 import play.api.data.Forms._
 import javax.inject._
 import scala.collection.{immutable => imm}
 import play.api._
-import play.api.i18n.{I18nSupport, Lang, MessagesApi}
+import play.api.i18n.{I18nSupport, Lang, MessagesApi, Messages}
 import play.api.mvc._
 import models._
 import java.sql.Connection
@@ -18,7 +23,9 @@ class HomeController @Inject()(
   val messagesApi: MessagesApi,
   dbApi: DBApi,
   val bloggerRepo: BloggerRepo,
-  implicit val settings: Settings
+  implicit val settings: Settings,
+  actorSystem: ActorSystem,
+  mailerClient: MailerClient
 ) extends Controller with I18nSupport with AuthenticatedSupport with TimeZoneSupport {
   val db = dbApi.database("default")
 
@@ -82,6 +89,17 @@ class HomeController @Inject()(
       newComment => {
         db.withConnection { implicit conn =>
           Comment.create(articleId, newComment.name, newComment.body)
+        }
+
+        actorSystem.scheduler.scheduleOnce(0.second) {
+          val email = Email(
+            Messages("postCommentNotification"),
+            settings.EmailFrom,
+            settings.EmailTo,
+            // sends text, HTML or both...
+            bodyText = Some("A text message")
+          )
+          mailerClient.send(email)
         }
 
         Ok(

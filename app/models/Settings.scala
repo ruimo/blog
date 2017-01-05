@@ -31,4 +31,10 @@ class Settings @Inject() (
   }.getOrElse {
     throw new Error("No site.externalLinks found in application.conf")
   }.toList
+  val EmailFrom = conf.getString("email.from").getOrElse(
+    throw new Error("No email.from.author found in application.conf")
+  )
+  val EmailTo: imm.Seq[String] = conf.getStringSeq("email.to").map { _.toList }.getOrElse {
+    throw new Error("No email.to found in application.conf")
+  }
 }
