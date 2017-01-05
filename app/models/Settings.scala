@@ -2,6 +2,9 @@ package models
 
 import play.api._
 import javax.inject._
+import scala.collection.{immutable => imm}
+
+case class ExternalLink(name: String, link: String)
 
 @Singleton
 class Settings @Inject() (
@@ -18,4 +21,14 @@ class Settings @Inject() (
   val Author: String = conf.getString("site.author").getOrElse(
     throw new Error("No site.author found in application.conf")
   )
+  val ExternalLinks: imm.Seq[ExternalLink] = conf.getConfigSeq("site.externalLinks").map { el =>
+    el.map { e =>
+      ExternalLink(
+        e.getString("name").getOrElse("No site.externalLinks[].name found in application.conf"),
+        e.getString("link").getOrElse("No site.externalLinks[].name found in application.conf")
+      )
+    }
+  }.getOrElse {
+    throw new Error("No site.externalLinks found in application.conf")
+  }.toList
 }

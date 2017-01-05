@@ -41,15 +41,30 @@
       <div class="logo">
         <a href="/"><img src="@routes.Assets.versioned("images/logo.gif")"></a>
       </div>
+      <div class="topMenu">
+        <div class="topMenu0">
+          <div class="title">
+            @settings.SiteTitle
+          </div>
+          <div style="clear:both;"></div>
+        </div>
+        <br>
+        <div class="topMenu1">
+          @settings.ExternalLinks.map { el =>
+            <a href="@el.link">@msg(el.name)</a>
+          }
+        </div>
+      </div>
       <div class="adminMenu">
-        @loginBlogger.map { blogger =>
-          <select id="contentsMenu">
-            <option value="">@msg("contentsMenu")</option>
-            <option value="location.href='@routes.FileController.index()'">@msg("fileUpload")</option>
-            <option value="location.href='@routes.ArticleController.startCreate()'">@msg("createArticle")</option>
-          </select>
-        }.getOrElse("")
-  
+        <div class="accountMenu">
+          @loginBlogger.map { blogger =>
+            <select id="contentsMenu">
+              <option value="">@msg("contentsMenu")</option>
+              <option value="location.href='@routes.FileController.index()'">@msg("fileUpload")</option>
+              <option value="location.href='@routes.ArticleController.startCreate()'">@msg("createArticle")</option>
+            </select>
+          }.getOrElse("")
+        </div>
         <div class="loginPanel">
           @loginBlogger match {
             case None => {

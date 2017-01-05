@@ -7,4 +7,4 @@ target
 /.settings
 /RUNNING_PID
 *~
-docker-launch-sh
+settings.conf

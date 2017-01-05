@@ -29,7 +29,9 @@ form dl dt {
 }
 
 .logo {
-    float: left;
+    float: left;;
+    margin-bottom: -32768px;
+    padding-bottom: 32768px;
 }
 
 .adminMenu {
@@ -40,7 +42,11 @@ form dl dt {
     display: inline-block;
 }
 
-.loginPanel {
+.adminMenu {
+    float: right;
+}
+
+.loginPanel,.accountMenu {
     display: inline-block;
 }
 
@@ -95,3 +101,27 @@ form dl dt {
 .ui-selectmenu-button.ui-button {
     width: auto;
 }
+
+.title {
+    font-size: 150%;
+}
+
+.topMenu {
+    vertical-align: top;
+    display: inline-block;
+    margin-bottom: -32768px;
+    padding-bottom: 32768px;
+}
+
+.topMenu0 {
+    padding: 8px;
+    vertical-align: top;
+    display: block;
+}
+
+.topMenu1 {
+    padding: 8px;
+    vertical-align: bottom;
+    display: block;
+}
+
