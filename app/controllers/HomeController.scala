@@ -17,7 +17,8 @@ import play.api.i18n.{I18nSupport, Messages => msg}
 class HomeController @Inject()(
   val messagesApi: MessagesApi,
   dbApi: DBApi,
-  val bloggerRepo: BloggerRepo
+  val bloggerRepo: BloggerRepo,
+  implicit val settings: Settings
 ) extends Controller with I18nSupport with AuthenticatedSupport with TimeZoneSupport {
   val db = dbApi.database("default")
 

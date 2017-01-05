@@ -92,3 +92,6 @@ form dl dt {
     padding: 3px;
 }
 
+.ui-selectmenu-button.ui-button {
+    width: auto;
+}

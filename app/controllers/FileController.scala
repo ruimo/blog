@@ -37,7 +37,7 @@ import helpers.Jdbc.{closeThrowingNothing, rollbackThrowing}
 @Singleton
 class FileController @Inject() (
   val messagesApi: MessagesApi,
-  settings: Settings,
+  implicit val settings: Settings,
   dbApi: DBApi,
   val bloggerRepo: BloggerRepo
 ) extends Controller with I18nSupport with AuthenticatedSupport with TimeZoneSupport {

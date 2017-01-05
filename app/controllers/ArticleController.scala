@@ -15,7 +15,7 @@ import models._
 @Singleton
 class ArticleController @Inject() (
   val messagesApi: MessagesApi,
-  settings: Settings,
+  implicit val settings: Settings,
   dbApi: DBApi,
   val bloggerRepo: BloggerRepo
 ) extends Controller with I18nSupport with AuthenticatedSupport with TimeZoneSupport {

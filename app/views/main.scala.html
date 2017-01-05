@@ -9,7 +9,8 @@
 )(
   implicit messagesApi: msg,
   request: RequestHeader,
-  flash: Flash
+  flash: Flash,
+  settings: Settings
 )
 
 <!DOCTYPE html>
@@ -25,12 +26,16 @@
     <script src="@routes.Assets.versioned("javascripts/jquery.cookie.js")"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.js"></script>
     <script src="@routes.Assets.versioned("javascripts/clipboard.js-master/dist/clipboard.min.js")"></script>
-    <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
     <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
     <link rel="stylesheet" media="screen" href="https://code.jquery.com/ui/1.12.1/themes/redmond/jquery-ui.css">
+    <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
+    <link rel="alternate" type="application/atom+xml" title="@settings.SiteTitle" href="/atom.xml">
     @header
   </head>
   <body>
+    @helper.form(action = helper.CSRF(routes.BloggerController.logoff()), 'id -> "logoffForm") {
+    }
+
     <div class="header">
       <div class="logo">
         <a href="/"><img src="@routes.Assets.versioned("images/logo.gif")"></a>
@@ -50,10 +55,15 @@
               </button>
             }
             case Some(blogger) => {
-              <span>@blogger.blogger.name</span>
+              <select id="accountMenu">
+                <option value="">@blogger.blogger.name</option>
+                <option value="logoff();">&nbsp;&nbsp;@Messages("logoff")</option>
+              </select>
+
+@*
               @helper.form(action = helper.CSRF(routes.BloggerController.logoff()), 'id -> "logoffForm") {
-                <input type="submit" value='@Messages("logoff")' class="button">
               }
+*@
             }
           }
         </div>
@@ -71,9 +81,19 @@
     </div>
 
     <script>
+var logoff = function() {
+  $('#logoffForm').submit();
+};
 $(function() {
   $.cookie('tz', jstz.determine().name());
   $("button,input[type='button'],input[type='submit']").button();
+  $("#accountMenu").selectmenu({
+    change: function(e, data) {
+      if (data.item.value != "") {
+        eval(data.item.value);
+      }
+    }
+  });
 });
     </script>
   </body>

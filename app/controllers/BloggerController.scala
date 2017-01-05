@@ -22,7 +22,7 @@ case class ChangePassword(currentPassword: String, newPasswords: (String, String
 @Singleton
 class BloggerController @Inject() (
   val messagesApi: MessagesApi,
-  settings: Settings,
+  implicit val settings: Settings,
   dbApi: DBApi,
   val bloggerRepo: BloggerRepo,
   passwordHash: PasswordHash

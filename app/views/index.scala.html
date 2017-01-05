@@ -12,7 +12,8 @@
   implicit messagesApi: msg,
   request: RequestHeader,
   flash: Flash,
-  loginBlogger: Option[LoginBlogger]
+  loginBlogger: Option[LoginBlogger],
+  settings: Settings
 )
 
 @main(messagesApi("top"), loginBlogger) {
