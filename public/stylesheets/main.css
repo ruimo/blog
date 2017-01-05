@@ -75,7 +75,7 @@ form dl dt {
     background-color: Moccasin;
 }
 
-.titleBar .id,.title,.name {
+.titleBar .id,.title,.name,.articleTitle {
     float: left;
     padding-right: 1em;
 }
