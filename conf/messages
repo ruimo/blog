@@ -54,3 +54,4 @@ newPasswords.main=New password
 newPasswords.confirm=New password(confirm)
 paswordChanged=Password changed.
 passwordDoesnotMatch=Current password does not match
+contentsMenu=Contents

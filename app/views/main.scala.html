@@ -30,6 +30,7 @@
     <link rel="stylesheet" media="screen" href="https://code.jquery.com/ui/1.12.1/themes/redmond/jquery-ui.css">
     <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
     <link rel="alternate" type="application/atom+xml" title="@settings.SiteTitle" href="/atom.xml">
+    <link rel="shortcut icon" href="@routes.Assets.versioned("images/favicon.ico")" type="image/x-icon" />
     @header
   </head>
   <body>
@@ -42,8 +43,11 @@
       </div>
       <div class="adminMenu">
         @loginBlogger.map { blogger =>
-          <a href="@routes.FileController.index()" class="fileUpload menuLink">@msg("fileUpload")</a>
-          <a href="@routes.ArticleController.startCreate()" class="createArticle menuLink">@msg("createArticle")</a>
+          <select id="contentsMenu">
+            <option value="">@msg("contentsMenu")</option>
+            <option value="location.href='@routes.FileController.index()'">@msg("fileUpload")</option>
+            <option value="location.href='@routes.ArticleController.startCreate()'">@msg("createArticle")</option>
+          </select>
         }.getOrElse("")
   
         <div class="loginPanel">
@@ -59,11 +63,6 @@
                 <option value="">@blogger.blogger.name</option>
                 <option value="logoff();">&nbsp;&nbsp;@Messages("logoff")</option>
               </select>
-
-@*
-              @helper.form(action = helper.CSRF(routes.BloggerController.logoff()), 'id -> "logoffForm") {
-              }
-*@
             }
           }
         </div>
@@ -87,7 +86,7 @@ var logoff = function() {
 $(function() {
   $.cookie('tz', jstz.determine().name());
   $("button,input[type='button'],input[type='submit']").button();
-  $("#accountMenu").selectmenu({
+  $("select").selectmenu({
     change: function(e, data) {
       if (data.item.value != "") {
         eval(data.item.value);
