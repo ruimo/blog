@@ -24,3 +24,12 @@ dl {
 .pageControl {
     float: right;
 }
+
+.sns {
+    text-align: right;
+}
+
+.sns .twitter {
+    display: inline-block;
+}
+

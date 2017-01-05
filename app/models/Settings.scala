@@ -37,4 +37,5 @@ class Settings @Inject() (
   val EmailTo: imm.Seq[String] = conf.getStringSeq("email.to").map { _.toList }.getOrElse {
     throw new Error("No email.to found in application.conf")
   }
+  val TweetScreenNameForArticle: Option[String] = conf.getString("sns.twitter.tweetArticle")
 }
