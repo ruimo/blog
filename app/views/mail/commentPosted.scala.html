@@ -1,0 +1,17 @@
+@import play.api.i18n.{Messages => msg}
+
+@(
+  articleId: ArticleId, comment: Comment
+)(
+  implicit messagesApi: msg,
+  settings: Settings
+)
+
+@msg("postCommentNotificationBody")
+
+@settings.SiteLink@routes.HomeController.fromId(articleId.value)
+
+@msg("postCommentNotificationComment"):
+
+@msg("name"): @comment.name.getOrElse("-")
+@msg("body"): @comment.body

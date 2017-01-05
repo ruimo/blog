@@ -96,8 +96,7 @@ class HomeController @Inject()(
             Messages("postCommentNotification"),
             settings.EmailFrom,
             settings.EmailTo,
-            // sends text, HTML or both...
-            bodyText = Some("A text message")
+            bodyText = Some(views.html.mail.commentPosted(articleId, newComment).toString)
           )
           mailerClient.send(email)
         }
