@@ -40,3 +40,7 @@ dl {
 #___plusone_0 {
     width:65px !important;
 }
+
+a:link,a:visited {
+    color: white;
+}

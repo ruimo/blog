@@ -40,7 +40,7 @@
             #@article.id.value
           </div>
           <div class="articleTitle">
-            @article.title
+            <a href="@routes.HomeController.fromId(article.id.value)">@article.title</a>
           </div>
           <div class="rightPane">
             <div class="publishDate">
