@@ -29,7 +29,14 @@ dl {
     text-align: right;
 }
 
-.sns .twitter {
+.sns * {
     display: inline-block;
 }
 
+.sns .pocket {
+    width: 90px;
+}
+
+#___plusone_0 {
+    width:65px !important;
+}

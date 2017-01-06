@@ -38,4 +38,8 @@ class Settings @Inject() (
     throw new Error("No email.to found in application.conf")
   }
   val TweetScreenNameForArticle: Option[String] = conf.getString("sns.twitter.tweetArticle")
+  val FbLikeArticle: Boolean = conf.getBoolean("sns.facebook.likeArticle").getOrElse(false)
+  val HatenaArticle: Boolean = conf.getBoolean("sns.hatena.article").getOrElse(false)
+  val PocketArticle: Boolean = conf.getBoolean("sns.pocket.article").getOrElse(false)
+  val GooglePlusArticle: Boolean = conf.getBoolean("sns.googlePlus.article").getOrElse(false)
 }

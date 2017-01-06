@@ -1,0 +1,8 @@
+@(
+  article: Article
+)(
+  implicit settings: Settings
+)
+@if(settings.GooglePlusArticle) {
+  <div class="g-plusone" data-href="@settings.SiteLink@routes.HomeController.fromId(article.id.value)"></div>
+}
