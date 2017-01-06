@@ -29,9 +29,7 @@ form dl dt {
 }
 
 .logo {
-    float: left;;
-    margin-bottom: -32768px;
-    padding-bottom: 32768px;
+    float: left;
 }
 
 .adminMenu {
@@ -109,8 +107,6 @@ form dl dt {
 .topMenu {
     vertical-align: top;
     display: inline-block;
-    margin-bottom: -32768px;
-    padding-bottom: 32768px;
 }
 
 .topMenu0 {
@@ -134,4 +130,15 @@ code {
     padding: 3px;
     display: block;
     border: solid;
+}
+
+.preview {
+    display: block;
+}
+
+.preview.body {
+    border: solid 1px;
+    min-height: 1em;
+    margin: 8px;
+    padding: 3px;
 }

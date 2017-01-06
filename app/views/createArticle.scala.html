@@ -14,13 +14,21 @@
 @import helper._
 
 @main(messagesApi("createArticleTitle"), loginBlogger) {
+  <script src="@routes.Assets.versioned("javascripts/bower-angular-sanitize-master/angular-sanitize.min.js")"></script>
   <script src="@routes.Assets.versioned("javascripts/article.js")"></script>
 } {
   <h1>@Messages("createArticleTitle")</h1>
 
-  @articleForm(id, myForm, routes.ArticleController.create)
+  <div class="articleMaintenance" ng-app="articlePreview" ng-controller="MainCtrl">
+    @articleForm(id, myForm, routes.ArticleController.create)
 
-  <button type="button" value="@msg("create")" onclick="submitArticle($('#articleForm').get()[0]);" id="submitButton">
-    @Messages("createArticle")
-  </button>
+    <button type="button" value="@msg("create")" onclick="submitArticle($('#articleForm').get()[0]);" id="submitButton">
+      @Messages("createArticle")
+    </button>
+
+    <div class="preview">
+      <div class="previewTitle">@msg("preview"):</div>
+      <div class="body preview" ng-bind-html="articleHtml"></div>
+    </div>
+  </div>
 }

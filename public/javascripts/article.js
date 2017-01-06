@@ -24,3 +24,8 @@ var submitArticle = function(form) {
 $(function() {
   $('.dateTime').datetimepicker();
 });
+
+var app = angular.module('articlePreview', ['ngSanitize']);
+app.controller("MainCtrl", function($scope) {
+  $scope.articleHtml = $("#body").text();
+});

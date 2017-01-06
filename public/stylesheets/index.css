@@ -41,7 +41,11 @@ dl {
     width:65px;
 }
 
-a:link,a:visited {
+.articleTitle a:link {
+    color: white;
+}
+
+.articleTitle a:visited {
     color: white;
 }
 

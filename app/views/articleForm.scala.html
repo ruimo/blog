@@ -15,6 +15,6 @@
 
 @form(action = CSRF(action(id)), 'id -> "articleForm") {
   @inputText(myForm("title"), 'size -> 100)
-  @textarea(myForm("body"), 'rows -> 20, 'cols -> 80)
+  @textarea(myForm("body"), 'rows -> 20, 'cols -> 80, Symbol("ng-model") -> "articleHtml")
   @inputText(myForm("publishTime"), 'class -> "dateTime", '_showConstraints -> false)
 }
