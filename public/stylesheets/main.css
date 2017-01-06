@@ -125,3 +125,13 @@ form dl dt {
     display: block;
 }
 
+pre {
+    margin: 2px !important;
+}
+
+code {
+    margin-left: 2em !important;
+    padding: 3px;
+    display: block;
+    border: solid;
+}
