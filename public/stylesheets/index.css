@@ -37,10 +37,15 @@ dl {
     width: 90px;
 }
 
-#___plusone_0 {
-    width:65px !important;
+.googlePlus {
+    width:65px;
 }
 
 a:link,a:visited {
     color: white;
+}
+
+.sns .facebook {
+    margin-top: 3px;
+    vertical-align: top;
 }
