@@ -32,7 +32,7 @@ GET     /test                       controllers.FileController.test()
 GET     /testGet                    controllers.FileController.testGet
 POST    /testPost                   controllers.FileController.testPost
 
-GET     /atom.xml                   controllers.RssController.atom(page: Int ?= 0, pageSize: Int ?= 10, orderBySpec: String ?= "publish_time desc", now: Long ?= System.currentTimeMillis)
+GET     /atom.xml                   controllers.RssController.atom(page: Int ?= 0, pageSize: Int ?= 50, orderBySpec: String ?= "publish_time desc", now: Long ?= System.currentTimeMillis)
 
 # An example controller showing how to use dependency injection
 

@@ -29,7 +29,7 @@
     <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
     <link rel="stylesheet" media="screen" href="https://code.jquery.com/ui/1.12.1/themes/redmond/jquery-ui.css">
     <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
-    <link rel="alternate" type="application/atom+xml" title="@settings.SiteTitle" href="/atom.xml">
+    <link rel="alternate" type="application/atom+xml" title="@settings.SiteTitle" href="@routes.RssController.atom()">
     <link rel="shortcut icon" href="@routes.Assets.versioned("images/favicon.ico")" type="image/x-icon" />
     @header
   </head>
@@ -54,6 +54,9 @@
         <div class="topMenu0">
           <div class="title">
             @settings.SiteTitle
+          </div>
+          <div class="rss">
+            <a href="@routes.RssController.atom()"><img src="@routes.Assets.versioned("images/feed-icon-28x28.png")"></a>
           </div>
           <div class="followMe">
             <a href="https://twitter.com/ruimo" class="twitter-follow-button" data-show-count="false">Follow @@ruimo</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>

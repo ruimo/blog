@@ -115,6 +115,10 @@ form dl dt {
     display: block;
 }
 
+.topMenu0 .rss,.followMe {
+    display: inline-block;
+}
+
 .topMenu1 {
     padding: 8px;
     vertical-align: bottom;
