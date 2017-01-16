@@ -31,12 +31,12 @@
           @recs.records.map { rec =>
             <tr class="row">
               <td class="thumbnailImg">
-                <a href="@routes.FileController.getImage(rec.id.get.value)">
+                <a target="_blank" href="@routes.FileController.getImage(rec.id.get.value)">
                   <img src="@routes.FileController.getImage(rec.id.get.value, true)">
                 </a>
               </td>
               <td class="fileName">
-                <a href="@routes.FileController.getImage(rec.id.get.value)">
+                <a target="_blank" href="@routes.FileController.getImage(rec.id.get.value)">
                   @rec.fileName
                 </a>
               </td>
