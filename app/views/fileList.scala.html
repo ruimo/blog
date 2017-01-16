@@ -30,8 +30,16 @@
         <table class="fileListTable">
           @recs.records.map { rec =>
             <tr class="row">
-              <td class="thumbnailImg"><img src="@routes.FileController.getImage(rec.id.get.value, true)"></td>
-              <td class="fileName">@rec.fileName</td>
+              <td class="thumbnailImg">
+                <a href="@routes.FileController.getImage(rec.id.get.value)">
+                  <img src="@routes.FileController.getImage(rec.id.get.value, true)">
+                </a>
+              </td>
+              <td class="fileName">
+                <a href="@routes.FileController.getImage(rec.id.get.value)">
+                  @rec.fileName
+                </a>
+              </td>
               <td class="createdTime">@imageDateFormatter.format(toLocalDateTime(rec.createdTime))</td>
               <td class="link">
                 <span id="url@rec.id.get.value">&lt;img src="@routes.FileController.getImage(rec.id.get.value)"&gt;</span>
