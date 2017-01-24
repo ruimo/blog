@@ -149,7 +149,7 @@ class ArticleController @Inject() (
         db.withConnection { implicit conn =>
           Comment.remove(CommentId(id))
         }
-        Redirect(routes.HomeController.index()).flashing("message" -> msg("removed", msg("article")))
+        Redirect(routes.HomeController.index()).flashing("message" -> msg("removed", msg("comment")))
       }
     )
   }
