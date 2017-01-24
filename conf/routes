@@ -21,7 +21,7 @@ POST    /updateArticle              controllers.ArticleController.update(id: Lon
 POST    /authorizeComment           controllers.ArticleController.authorizeComment()
 POST    /removeComment              controllers.ArticleController.removeComment()
 
-POST    /postComment                controllers.HomeController.postComment(id: Long)
+POST    /komentoKakikomi            controllers.HomeController.postComment(id: Long)
 
 GET     /files                      controllers.FileController.index(page: Int ?= 0, pageSize: Int ?= 10, orderBySpec: String ?= "created_time desc")
 POST    /uploadFile                 controllers.FileController.create()
