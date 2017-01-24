@@ -32,8 +32,8 @@ class HomeController @Inject()(
   val commentForm = Form(
     mapping(
       "articleId" -> longNumber,
-      "name" -> optional(text(maxLength = 64)),
-      "body" -> nonEmptyText(1, 1024)
+      "namae" -> optional(text(maxLength = 64)),
+      "naiyo" -> nonEmptyText(1, 1024)
     )(
       (articleId, name, body) => Comment(None, ArticleId(articleId), name, body, false)
     )(

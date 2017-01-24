@@ -13,7 +13,7 @@
 
 @form(action = CSRF(routes.HomeController.postComment(articleId.value)), 'class -> "commentForm") {
   <input type="hidden" name="articleId" value="@articleId.value">
-  @inputText(commentForm("name"), 'size -> 64, '_showConstraints -> false, '_label -> null, 'placeholder -> msg("courtegyName"))
-  @textarea(commentForm("body"), 'rows -> 5, 'cols -> 80, '_showConstraints -> false, '_label -> null, 'placeholder -> msg("comment"))
+  @inputText(commentForm("namae"), 'size -> 64, '_showConstraints -> false, '_label -> null, 'placeholder -> msg("courtegyName"))
+  @textarea(commentForm("naiyo"), 'rows -> 5, 'cols -> 80, '_showConstraints -> false, '_label -> null, 'placeholder -> msg("comment"))
   <button type="button" onclick="postComment(articleId.value, this.form);">@msg("postComment")</button>
 }
