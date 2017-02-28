@@ -32,10 +32,6 @@ form dl dt {
     float: left;
 }
 
-.adminMenu {
-    float: right;
-}
-
 .createArticleLink {
     display: inline-block;
 }
@@ -44,7 +40,7 @@ form dl dt {
     float: right;
 }
 
-.loginPanel,.accountMenu {
+.loginPanel,.accountMenu,#google_translate_element {
     display: inline-block;
 }
 
