@@ -7,7 +7,7 @@ var removeComment = function(id, confirmMsg, yes, no) {
 }
 
 var remove = function(id, confirmMsg, yes, no, formName) {
-  var dlg = $("#removeDialog");
+  var dlg = $("#confirmDialog");
   dlg.text(confirmMsg);
   dlg.dialog({
     modal: true,
@@ -31,22 +31,46 @@ var remove = function(id, confirmMsg, yes, no, formName) {
   });
 };
 
-var postComment = function(articleId, form) {
-  $.ajax({
-    url: $(form).attr("action"),
-    method: $(form).attr("method"),
-    dataType: "json",
-    data: new FormData(form),
-    processData: false,
-    contentType: false
-  }).done(function(data, status, jqXhr) {
-    location.href='/';
-  }).fail(function(jqXhr, textStatus, errorThrown) {
-    console.log('fail', textStatus);
-    if (jqXhr.responseJSON.status === "ValidationError") {
-      console.log('validation error', JSON.stringify(jqXhr.responseJSON));
-      $(form).html(jqXhr.responseJSON.form);
-      $("button,input[type='button'],input[type='submit']").button();
-    }
+var confirmPostComment = function(articleId, form, yes, no, confirmMsg) {
+  var dlg = $("#confirmDialog");
+  dlg.text(confirmMsg);
+  dlg.dialog({
+    modal: true,
+    buttons: [
+      {
+        text: yes,
+        class: 'yes-button',
+        click: function() {
+          $.ajax({
+            url: $(form).attr("action"),
+            method: $(form).attr("method"),
+            dataType: "json",
+            data: new FormData(form),
+            processData: false,
+            contentType: false
+          }).done(function(data, status, jqXhr) {
+            location.href='/';
+          }).fail(function(jqXhr, textStatus, errorThrown) {
+            console.log('fail', textStatus);
+            if (jqXhr.responseJSON.status === "ValidationError") {
+              console.log('validation error', JSON.stringify(jqXhr.responseJSON));
+              $(form).html(jqXhr.responseJSON.form);
+              $("button,input[type='button'],input[type='submit']").button();
+            }
+          });
+        }
+      },    
+      {
+        text: no,
+        class: 'no-button',
+        click: function() {
+          $(this).dialog('close');
+        }
+      }
+    ]
   });
+};
+
+var postComment = function(articleId, form, yes, no, confirmMsg) {
+  confirmPostComment(articleId, form, yes, no, confirmMsg);
 };

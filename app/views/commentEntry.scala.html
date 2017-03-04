@@ -15,5 +15,5 @@
   <input type="hidden" name="articleId" value="@articleId.value">
   @inputText(commentForm("namae"), 'size -> 64, '_showConstraints -> false, '_label -> null, 'placeholder -> msg("courtegyName"))
   @textarea(commentForm("naiyo"), 'rows -> 5, 'cols -> 80, '_showConstraints -> false, '_label -> null, 'placeholder -> msg("comment"))
-  <button type="button" onclick="postComment(articleId.value, this.form);">@msg("postComment")</button>
+  <button type="button" onclick="postComment(articleId.value, this.form, '@msg("yes")', '@msg("no")', '@msg("confirmPostComment")');">@msg("postComment")</button>
 }
