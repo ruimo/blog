@@ -4,5 +4,5 @@
   implicit settings: Settings
 )
 @if(settings.PocketArticle) {
-  <a data-save-url="@settings.SiteLink@routes.HomeController.fromId(article.id.value)" data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en"></a>
+  <a data-save-url="@settings.SiteLink@routes.HomeController.showArticle(article.id.value)" data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en"></a>
 }

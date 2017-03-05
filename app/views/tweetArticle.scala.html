@@ -4,5 +4,5 @@
   implicit settings: Settings
 )
 @settings.TweetScreenNameForArticle.map { screenName =>
-  <a href="https://twitter.com/share" class="twitter-share-button" data-url="@settings.SiteLink@routes.HomeController.fromId(article.id.value)" data-text="@article.title" data-via="@screenName" data-size="small">Tweet</a>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-url="@settings.SiteLink@routes.HomeController.showArticle(article.id.value)" data-text="@article.title" data-via="@screenName" data-size="small">Tweet</a>
 }
