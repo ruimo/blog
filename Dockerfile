@@ -1,10 +1,10 @@
-FROM ubuntu
+FROM ruimo/df-ub-jdk8
 MAINTAINER Shisei Hanai<shanai@jp.ibm.com>
 
 RUN apt-get update
 RUN apt-get upgrade -y
 RUN apt-get dist-upgrade -y
-RUN apt-get install imagemagick openjdk-8-jdk -y
+RUN apt-get install imagemagick -y
 
 ADD target/universal /opt/blog
 RUN cd /opt/blog && \
