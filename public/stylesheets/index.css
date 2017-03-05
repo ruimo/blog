@@ -53,3 +53,7 @@ dl {
     margin-top: 3px;
     vertical-align: top;
 }
+
+.publishDate {
+    padding: 3px;
+}
