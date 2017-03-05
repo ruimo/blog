@@ -31,7 +31,7 @@ var remove = function(id, confirmMsg, yes, no, formName) {
   });
 };
 
-var confirmPostComment = function(articleId, form, yes, no, confirmMsg) {
+var confirmPostComment = function(articleId, form, yes, no, confirmMsg, redirectUrl) {
   var dlg = $("#confirmDialog");
   dlg.text(confirmMsg);
   dlg.dialog({
@@ -49,7 +49,7 @@ var confirmPostComment = function(articleId, form, yes, no, confirmMsg) {
             processData: false,
             contentType: false
           }).done(function(data, status, jqXhr) {
-            location.href='/';
+            location.href=redirectUrl;
           }).fail(function(jqXhr, textStatus, errorThrown) {
             console.log('fail', textStatus);
             if (jqXhr.responseJSON.status === "ValidationError") {
@@ -71,6 +71,6 @@ var confirmPostComment = function(articleId, form, yes, no, confirmMsg) {
   });
 };
 
-var postComment = function(articleId, form, yes, no, confirmMsg) {
-  confirmPostComment(articleId, form, yes, no, confirmMsg);
+var postComment = function(articleId, form, yes, no, confirmMsg, redirectUrl) {
+  confirmPostComment(articleId, form, yes, no, confirmMsg, redirectUrl);
 };

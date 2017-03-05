@@ -172,7 +172,7 @@ object Article {
         )
         or c0.comment_id is null
       )
-      order by $orderBy, c0.created_time
+      order by $orderBy, c0.created_time desc
       limit {pageSize} offset {offset}
       """
     ).on(
@@ -187,6 +187,19 @@ object Article {
     accumRecords(page, pageSize, orderBy, now, recs)
   }
 
+  def articleWithCommentSql(where: String) = s"""
+    select * from article a0
+    left join comment c0 on a0.article_id = c0.article_id
+    where $where
+    and a0.publish_time <= {now}
+    and (
+      c0.comment_id in (
+        select comment_id from comment c1 where c0.article_id = c1.article_id order by c1.created_time limit {commentsPerArticle}
+      )
+      or c0.comment_id is null
+    )
+  """
+
   def listWithCommentFrom(
     page: Int = 0, pageSize: Int = 10, orderBy: OrderBy = OrderBy("publish_time", Desc),
     now: Long = System.currentTimeMillis, commentsPerArticle: Int = 5, fromId: ArticleId
@@ -197,18 +210,9 @@ object Article {
 
     val offset: Int = pageSize * page
     val recs: List[(Article, Option[Comment])] = SQL(
+      articleWithCommentSql("a0.publish_time <= (select publish_time from article where article_id = {fromId})") +
       s"""
-      select * from article a0
-      left join comment c0 on a0.article_id = c0.article_id
-      where a0.publish_time <= (select publish_time from article where article_id = {fromId})
-      and a0.publish_time <= {now}
-      and (
-        c0.comment_id in (
-          select comment_id from comment c1 where c0.article_id = c1.article_id order by c1.created_time limit {commentsPerArticle}
-        )
-        or c0.comment_id is null
-      )
-      order by $orderBy, c0.created_time
+      order by $orderBy, c0.created_time desc
       limit {pageSize} offset {offset}
       """
     ).on(
@@ -222,6 +226,29 @@ object Article {
     )
 
     accumRecords(page, pageSize, orderBy, now, recs)
+  }
+
+  def showWithComment(
+    id: ArticleId, now: Long = System.currentTimeMillis, commentsPerArticle: Int = 20
+  )(
+    implicit conn: Connection
+  ): (Article, imm.Seq[Comment]) = {
+    import scala.language.postfixOps
+
+    val recs = SQL(
+      articleWithCommentSql("a0.article_id = {id}") +
+      "order by c0.created_time desc"
+    ).on(
+      'now -> Instant.ofEpochMilli(now),
+      'commentsPerArticle -> commentsPerArticle,
+      'id -> id.value
+    ).as(
+      withComment *
+    )
+
+    (
+      recs.head._1, recs.foldLeft(Vector[Comment]()) { (sum, e) => sum ++ e._2 }
+    )
   }
 
   def accumRecords(

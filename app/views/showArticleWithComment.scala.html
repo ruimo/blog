@@ -1,0 +1,113 @@
+@import java.time.format.DateTimeFormatter
+@import java.time.LocalDateTime
+@import play.api.i18n.{Messages => msg}
+@import scala.collection.{immutable => imm}
+@(
+  rec: (Article, imm.Seq[Comment]),
+  publishDateFormatter: DateTimeFormatter,
+  toLocalDateTime: Long => LocalDateTime,
+  commentForm: Form[Comment]
+)(
+  implicit messagesApi: msg,
+  request: RequestHeader,
+  flash: Flash,
+  loginBlogger: Option[LoginBlogger],
+  settings: Settings
+)
+
+@main(messagesApi("top"), loginBlogger) {
+  <script src="@routes.Assets.versioned("javascripts/index.js")"></script>
+  <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/index.css")">
+} {
+  @helper.form(action = helper.CSRF(routes.ArticleController.remove()), 'id -> "removeArticleForm") {
+    <input type="hidden" class="id" name="id" value="">
+  }
+
+  @helper.form(action = helper.CSRF(routes.ArticleController.removeComment()), 'id -> "removeCommentForm") {
+    <input type="hidden" class="id" name="id" value="">
+  }
+
+  <div class="article">
+    <div class="titleBar">
+      <div class="id">
+        #@rec._1.id.value
+      </div>
+      <div class="articleTitle">
+        <a href="@routes.HomeController.fromId(rec._1.id.value)">@rec._1.title</a>
+      </div>
+      <div class="rightPane">
+        <div class="publishDate">
+          @publishDateFormatter.format(toLocalDateTime(rec._1.publishTime))
+        </div>
+        @if(loginBlogger.isDefined) {
+          <div class="edit">
+            <button type="button" class="button" onclick="location.href='@routes.ArticleController.updateStart(rec._1.id.value);'">
+              @msg("edit")
+            </button>
+          </div>
+          <div class="remove">
+            <button type="button" class="button" onclick='removeArticle(@rec._1.id.value, "@msg("deleteConfirm")", "@msg("yes")", "@msg("no")");'>@msg("remove")</button>
+          </div>
+        }
+      </div>
+      <div class="eol"></div>
+    </div>
+    <div class="sns">
+      <div class="facebook">
+        @fbLikeArticle(rec._1)
+      </div>
+      <div class="twitter">
+        @tweetArticle(rec._1)
+      </div>
+      <div class="hatena">
+        @hatenaArticle(rec._1)
+      </div>
+      <div class="googlePlus">
+        @googlePlusArticle(rec._1)
+      </div>
+      <div class="pocket">
+        @pocketArticle(rec._1)
+      </div>
+    </div>
+    <div class="body">@Html(rec._1.body)</div>
+    <div class="commentArea">
+      <div class="comments">
+        @rec._2.map { c =>
+          <div class="titleBar @if(!c.authorized) {waitingAuthorization} else {}">
+            <div class="name">
+              @if(!c.authorized) { <span></span> } else { @c.name.getOrElse(msg("anonymous")) }
+            </div>
+            @if(!c.authorized) {<span class="body">@msg("waitingAuthorization")</span>} else {}
+            <div class="rightPane">
+              <div class="publishDate">
+                @publishDateFormatter.format(toLocalDateTime(c.createdTime))
+              </div>
+              @if(loginBlogger.isDefined) {
+                @if(!c.authorized) {
+                  @helper.form(action = helper.CSRF(routes.ArticleController.authorizeComment()), 'class -> "authorizeCommentForm") {
+                    <input type="hidden" class="id" name="id" value="@c.id.get.value">
+                    <input type="submit" value="@msg("authorize")">
+                  }
+                }
+                <button type="button" class="button" onclick='removeComment(@c.id.get.value, "@msg("deleteCommentConfirm")", "@msg("yes")", "@msg("no")");'>@msg("remove")</button>
+              }
+            </div>
+            <div class="eol"></div>
+          </div>
+          <div id="bodyWrapper@c.id.get.value" class="@if(!c.authorized) {waitingAuthorization} else {}">
+            @if(c.authorized || loginBlogger.isDefined) {
+              <pre class="body">@c.body</pre>
+            }
+          </div>
+      }
+      </div>
+      <div id="commentEntry@rec._1.id.value" class="commentEntry">
+        @commentEntry(rec._1.id, commentForm)
+      </div>
+    </div>
+  </div>
+
+  @backMenu()
+
+  <div id="confirmDialog"></div>
+}

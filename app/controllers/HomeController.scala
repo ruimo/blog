@@ -109,4 +109,17 @@ class HomeController @Inject()(
       }
     )
   }
+
+  def showArticle(id: Long) = Action { implicit req =>
+    db.withConnection { implicit conn =>
+      Ok(
+        views.html.showArticleWithComment(
+          Article.showWithComment(ArticleId(id)),
+          TimeZoneSupport.formatter(msg("publishDateFormatInArticleList")),
+          toLocalDateTime(_)(implicitly),
+          commentForm
+        )
+      )
+    }
+  }
 }

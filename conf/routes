@@ -20,6 +20,7 @@ GET     /updateArticle              controllers.ArticleController.updateStart(id
 POST    /updateArticle              controllers.ArticleController.update(id: Long)
 POST    /authorizeComment           controllers.ArticleController.authorizeComment()
 POST    /removeComment              controllers.ArticleController.removeComment()
+GET     /showArticle                controllers.HomeController.showArticle(id: Long)
 
 POST    /komentoKakikomi            controllers.HomeController.postComment(id: Long)
 
