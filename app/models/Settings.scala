@@ -5,6 +5,7 @@ import javax.inject._
 import scala.collection.{immutable => imm}
 
 case class ExternalLink(name: String, link: String)
+case class Recaptcha(url: String, secret: String)
 
 @Singleton
 class Settings @Inject() (
@@ -42,4 +43,8 @@ class Settings @Inject() (
   val HatenaArticle: Boolean = conf.getBoolean("sns.hatena.article").getOrElse(false)
   val PocketArticle: Boolean = conf.getBoolean("sns.pocket.article").getOrElse(false)
   val GooglePlusArticle: Boolean = conf.getBoolean("sns.googlePlus.article").getOrElse(false)
+  val recaptcha = Recaptcha(
+    url = conf.getString("recaptcha.url").getOrElse(throw new Error("No recaptcha.url specified in application.conf")),
+    secret = conf.getString("recaptcha.secret").getOrElse(throw new Error("No recaptcha.secret specified in application.conf"))
+  )
 }

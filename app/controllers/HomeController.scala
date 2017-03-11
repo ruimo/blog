@@ -1,5 +1,7 @@
 package controllers
 
+import scala.concurrent.Await
+import play.api.libs.ws._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import akka.actor.ActorSystem
@@ -25,20 +27,31 @@ class HomeController @Inject()(
   val bloggerRepo: BloggerRepo,
   implicit val settings: Settings,
   actorSystem: ActorSystem,
-  mailerClient: MailerClient
+  mailerClient: MailerClient,
+  ws: WSClient
 ) extends Controller with I18nSupport with AuthenticatedSupport with TimeZoneSupport {
   val db = dbApi.database("default")
+
+  val isRecaptchaValid: String => Boolean = recaptcha => {
+    val req = ws.url(settings.recaptcha.url)
+      .withQueryString("secret" -> settings.recaptcha.secret, "response" -> recaptcha)
+      .get
+    (Json.parse(Await.result(req, 10.seconds).body) \ "success").get == "true"
+  }
 
   val commentForm = Form(
     mapping(
       "articleId" -> longNumber,
       "namae" -> optional(text(maxLength = 64)),
-      "naiyo" -> nonEmptyText(1, 1024)
+      "comment" -> nonEmptyText(1, 1024),
+      "g-recaptcha-response" -> nonEmptyText.verifying(
+        "checkCaptcha", isRecaptchaValid
+      )
     )(
-      (articleId, name, body) => Comment(None, ArticleId(articleId), name, body, false)
+      (articleId, name, body, recaptcha) => Comment(None, ArticleId(articleId), name, body, false)
     )(
       (comment) => Some(
-        (comment.articleId.value, comment.name, comment.body)
+        (comment.articleId.value, comment.name, comment.body, "")
       )
     )
   )
