@@ -98,3 +98,4 @@ tools=ツール
 confirmPostComment=コメントを書き込んでよろしいでしょうか？
 top=トップ
 checkCaptcha=reCAPTCHAをチェックしてください
+postComment=コメントする

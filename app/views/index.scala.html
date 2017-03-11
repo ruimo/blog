@@ -108,8 +108,8 @@
               </div>
           }
           </div>
-          <div id="commentEntry@article.id.value" class="commentEntry">
-            @commentEntry(article.id, commentForm)
+          <div>
+            <a href="@routes.HomeController.showArticle(article.id.value)">@msg("postComment")</a>
           </div>
         </div>
       </div>
