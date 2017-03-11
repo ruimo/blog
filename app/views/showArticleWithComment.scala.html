@@ -17,6 +17,7 @@
 
 @main(messagesApi("top"), loginBlogger) {
   <script src="@routes.Assets.versioned("javascripts/index.js")"></script>
+  <script src="@routes.Assets.versioned("javascripts/comment.js")"></script>
   <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/index.css")">
 } {
   @helper.form(action = helper.CSRF(routes.ArticleController.remove()), 'id -> "removeArticleForm") {
