@@ -16,7 +16,10 @@
   @inputText(commentForm("namae"), 'size -> 64, '_showConstraints -> false, '_label -> null, 'placeholder -> msg("courtegyName"))
   @textarea(commentForm("comment"), 'rows -> 5, 'cols -> 80, '_showConstraints -> false, '_label -> null, 'placeholder -> msg("comment"))
   <div class="g-recaptcha" data-callback="onCommentRecaptcha" data-sitekey="6LdtpxcUAAAAAN616Y1aEbxgHBPTA1wpB8ztdkBn"></div>
+  <input class="postCommentButton" type="submit" value="@msg("postComment")" disabled>
+@**
   <button class="postCommentButton" type="button" onclick="postComment(articleId.value, this.form, '@msg("yes")', '@msg("no")', '@msg("confirmPostComment")', '@routes.HomeController.showArticle(articleId.value).url');" disabled>@msg("postComment")</button>
+**@
 }
 
 <script>
