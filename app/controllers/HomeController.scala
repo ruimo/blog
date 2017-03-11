@@ -33,13 +33,13 @@ class HomeController @Inject()(
   val db = dbApi.database("default")
 
   val isRecaptchaValid: String => Boolean = recaptcha => {
-    Logger.info("recaptcha settings: " + settings.recaptcha)
     Logger.info("recaptcha string: " + recaptcha)
     val req = ws.url(settings.recaptcha.url)
       .post(Map("secret" -> Seq(settings.recaptcha.secret), "response" -> Seq(recaptcha)))
     val jsonResp = Json.parse(Await.result(req, 10.seconds).body)
     Logger.info("recaptcha response: " + jsonResp)
-    (jsonResp \ "success").get == "true"
+    val isSuccess = (jsonResp \ "success").get
+    isSuccess == "true"
   }
 
   val commentForm = Form(
