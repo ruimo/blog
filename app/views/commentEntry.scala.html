@@ -22,7 +22,8 @@
 <script>
 var onCommentRecaptcha = function(recaptcha) {
   if (recaptcha !== "") {
-    $(".postCommentButton").removeAttr("disabled");
+    $(".postCommentButton").prop('disabled', false);
+    $(".postCommentButton").removeClass("ui-state-disabled");
   }
 };
 </script>
