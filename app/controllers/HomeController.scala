@@ -92,6 +92,51 @@ class HomeController @Inject()(
     val form = commentForm.bindFromRequest
     form.fold(
       formWithError => {
+        db.withConnection { implicit conn =>
+          BadRequest(
+            views.html.showArticleWithComment(
+              Article.showWithComment(ArticleId(id)),
+              TimeZoneSupport.formatter(msg("publishDateFormatInArticleList")),
+              toLocalDateTime(_)(implicitly),
+              formWithError
+            )
+          )
+        }
+      },
+      newComment => {
+        db.withConnection { implicit conn =>
+          Comment.create(articleId, newComment.name, newComment.body)
+        }
+
+        actorSystem.scheduler.scheduleOnce(0.second) {
+          val email = Email(
+            Messages("postCommentNotification"),
+            settings.EmailFrom,
+            settings.EmailTo,
+            bodyText = Some(views.html.mail.commentPosted(articleId, newComment).toString)
+          )
+          mailerClient.send(email)
+        }
+
+        db.withConnection { implicit conn =>
+          Ok(
+            views.html.showArticleWithComment(
+              Article.showWithComment(ArticleId(id)),
+              TimeZoneSupport.formatter(msg("publishDateFormatInArticleList")),
+              toLocalDateTime(_)(implicitly),
+              commentForm
+            )
+          )
+        }
+      }
+    )
+  }
+
+  def postCommentJson(id: Long) = Action { implicit req =>
+    val articleId = ArticleId(id)
+    val form = commentForm.bindFromRequest
+    form.fold(
+      formWithError => {
         BadRequest(
           Json.obj(
             "status" -> JsString("ValidationError"),
