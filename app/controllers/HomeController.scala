@@ -48,7 +48,7 @@ class HomeController @Inject()(
       "articleId" -> longNumber,
       "namae" -> optional(text(maxLength = 64)),
       "comment" -> nonEmptyText(1, 1024),
-      "g-recaptcha-response" -> nonEmptyText.verifying(
+      "g-recaptcha-response" -> text.verifying(
         "checkCaptcha", isRecaptchaValid
       )
     )(
