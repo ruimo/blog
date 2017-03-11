@@ -123,16 +123,9 @@ class HomeController @Inject()(
           mailerClient.send(email)
         }
 
-        db.withConnection { implicit conn =>
-          Ok(
-            views.html.showArticleWithComment(
-              Article.showWithComment(ArticleId(id)),
-              TimeZoneSupport.formatter(msg("publishDateFormatInArticleList")),
-              toLocalDateTime(_)(implicitly),
-              commentForm
-            )
-          )
-        }
+        Redirect(
+          routes.HomeController.showArticle(id)
+        ).flashing("message" -> Messages("commentPosted"))
       }
     )
   }
