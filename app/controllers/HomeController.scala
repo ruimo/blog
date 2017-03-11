@@ -38,8 +38,9 @@ class HomeController @Inject()(
       .post(Map("secret" -> Seq(settings.recaptcha.secret), "response" -> Seq(recaptcha)))
     val jsonResp = Json.parse(Await.result(req, 10.seconds).body)
     Logger.info("recaptcha response: " + jsonResp)
-    val isSuccess = (jsonResp \ "success").get
-    isSuccess == "true"
+    val isSuccess: Boolean = (jsonResp \ "success").as[Boolean]
+    Logger.info("isSuccess: " + isSuccess)
+    isSuccess
   }
 
   val commentForm = Form(
