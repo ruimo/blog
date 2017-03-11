@@ -92,6 +92,7 @@ class HomeController @Inject()(
     val form = commentForm.bindFromRequest
     form.fold(
       formWithError => {
+        Logger.error("HomeController.postComment(" + id + ") validation error " + formWithError)
         db.withConnection { implicit conn =>
           BadRequest(
             views.html.showArticleWithComment(
