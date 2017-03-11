@@ -11,7 +11,7 @@ RUN cd /opt/blog && \
   cmd=$(basename *.tgz .tgz) && \
   tar xf ${cmd}.tgz && \
   echo printenv > launch.sh && \
-  echo /opt/blog/$cmd/bin/blog-server -Drecaptcha.secret="\${RECAPTCHA_SECRET}" -Duser.home=/root -DapplyEvolutions.default=true -Dplay.crypto.secret=\${APP_SECRET} \$BLOG_OPT >> launch.sh && \
+  echo /opt/blog/$cmd/bin/blog-server -Duser.home=/root -DapplyEvolutions.default=true -Dplay.crypto.secret=\${APP_SECRET} \$BLOG_OPT >> launch.sh && \
   chmod +x launch.sh && \
   chmod -R 777 /opt/blog
 
