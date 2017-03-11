@@ -34,6 +34,7 @@ class HomeController @Inject()(
 
   val isRecaptchaValid: String => Boolean = recaptcha => {
     Logger.info("recaptcha settings: " + settings.recaptcha)
+    Logger.info("recaptcha string: " + recaptcha)
     val req = ws.url(settings.recaptcha.url)
       .post(Map("secret" -> Seq(settings.recaptcha.secret), "response" -> Seq(recaptcha)))
     val jsonResp = Json.parse(Await.result(req, 10.seconds).body)
