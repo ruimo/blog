@@ -23,9 +23,9 @@
   <meta property="og:title" content="@rec._1.title" />
   <meta property="og:description" content="@Ogp.description(rec._1.body)" />
   <meta property="og:site_name" content="@settings.SiteTitle" />
-  @thumbnail.foreach { t =>
+  @thumbnail.map { t =>
     <meta property="og:image" content="@routes.FileController.getImage(t.value)" />
-  }
+  }.getOrElse("")
   <script src="@routes.Assets.versioned("javascripts/index.js")"></script>
   <script src="@routes.Assets.versioned("javascripts/comment.js")"></script>
   <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/index.css")">
