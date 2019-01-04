@@ -40,7 +40,7 @@
             #@article.id.value
           </div>
           <div class="articleTitle">
-            <a href="@routes.HomeController.showArticle(article.id.value)">@article.title</a>
+            <a href="@routes.HomeController.showArticleById(article.id.value)">@article.title</a>
           </div>
           <div class="rightPane">
             <div class="publishDate">
@@ -110,7 +110,7 @@
           </div>
         </div>
         <div>
-          <a href="@routes.HomeController.showArticle(article.id.value)">@msg("postComment")</a>
+          <a href="@routes.HomeController.showArticleById(article.id.value)">@msg("postComment")</a>
         </div>
       </div>
     }

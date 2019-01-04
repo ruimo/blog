@@ -4,5 +4,5 @@
   implicit settings: Settings
 )
 @if(settings.GooglePlusArticle) {
-  <div class="g-plusone" data-href="@settings.SiteLink@routes.HomeController.showArticle(article.id.value)"></div>
+  <div class="g-plusone" data-href="@settings.SiteLink@routes.HomeController.showArticleById(article.id.value)"></div>
 }

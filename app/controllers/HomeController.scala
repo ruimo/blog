@@ -130,7 +130,7 @@ class HomeController @Inject()(
         }
 
         Redirect(
-          routes.HomeController.showArticle(id)
+          routes.HomeController.showArticleById(id)
         ).flashing("message" -> Messages("commentPosted"))
       }
     )
@@ -173,6 +173,12 @@ class HomeController @Inject()(
   }
 
   def showArticle(id: Long) = Action { implicit req =>
+    Redirect(
+      routes.HomeController.showArticleById(id)
+    )
+  }
+
+  def showArticleById(id: Long) = Action { implicit req =>
     db.withConnection { implicit conn =>
       Ok(
         views.html.showArticleWithComment(

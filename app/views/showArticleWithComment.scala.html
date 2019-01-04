@@ -18,7 +18,7 @@
 )
 
 @main(messagesApi("top"), loginBlogger) {
-  <meta property="og:url" content="@settings.SiteLink@routes.HomeController.showArticle(rec._1.id.value)" />
+  <meta property="og:url" content="@settings.SiteLink@routes.HomeController.showArticleById(rec._1.id.value)" />
   <meta property="og:type" content="article" />
   <meta property="og:title" content="@rec._1.title" />
   <meta property="og:description" content="@Html(Ogp.description(rec._1.body))" />

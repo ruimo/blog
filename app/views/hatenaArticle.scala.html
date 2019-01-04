@@ -5,6 +5,6 @@
 )
 
 @if(settings.HatenaArticle) {
-  <a href="@settings.SiteLink@routes.HomeController.showArticle(article.id.value)" class="hatena-bookmark-button" data-hatena-bookmark-title="@article.title" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a>
+  <a href="@settings.SiteLink@routes.HomeController.showArticleById(article.id.value)" class="hatena-bookmark-button" data-hatena-bookmark-title="@article.title" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a>
 }
 
