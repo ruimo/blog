@@ -1,3 +1,4 @@
+@import helpers.Ogp
 @import java.time.format.DateTimeFormatter
 @import java.time.LocalDateTime
 @import play.api.i18n.{Messages => msg}
@@ -6,7 +7,8 @@
   rec: (Article, imm.Seq[Comment]),
   publishDateFormatter: DateTimeFormatter,
   toLocalDateTime: Long => LocalDateTime,
-  commentForm: Form[Comment]
+  commentForm: Form[Comment],
+  thumbnail: Option[ImageId]
 )(
   implicit messagesApi: msg,
   request: RequestHeader,
@@ -16,6 +18,14 @@
 )
 
 @main(messagesApi("top"), loginBlogger) {
+  <meta property="og:url" content="@settings.SiteLink@routes.HomeController.showArticle(rec._1.id.value)" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="@rec._1.title" />
+  <meta property="og:description" content="@Ogp.description(rec._1.body)" />
+  <meta property="og:site_name" content="@settings.SiteTitle" />
+  @thumbnail.foreach { t =>
+    <meta property="og:image" content="@routes.FileController.getImage(t.value)" />
+  }
   <script src="@routes.Assets.versioned("javascripts/index.js")"></script>
   <script src="@routes.Assets.versioned("javascripts/comment.js")"></script>
   <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/index.css")">

@@ -109,4 +109,21 @@ object Image {
       SqlParser.get[Option[Long]]("len") ~ SqlParser.str("file_name") ~ SqlParser.get[Option[String]]("content_type") map (SqlParser.flatten) singleOpt
     )
   }
+
+  def getThumbnail(id: ArticleId)(implicit conn: Connection): Option[ImageId] = {
+    import scala.language.postfixOps
+
+    SQL(
+      """
+      select image_id from image
+      where created_time <= (select article.created_time from article where article.article_id = {articleId})
+      order by created_time desc
+      limit 1
+      """
+    ).on(
+      'articleId -> id.value
+    ).as(
+      SqlParser.scalar[Long].singleOpt
+    ).map(ImageId.apply)
+  }
 }

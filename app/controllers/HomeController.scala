@@ -2,21 +2,26 @@ package controllers
 
 import scala.concurrent.Await
 import play.api.libs.ws._
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import akka.actor.ActorSystem
 import play.api.libs.mailer._
 import java.io.File
-import play.api.libs.json.{Json, JsString}
+
+import play.api.libs.json.{JsString, Json}
 import play.api.data._
 import play.api.data.Forms._
 import javax.inject._
+
 import scala.collection.{immutable => imm}
 import play.api._
-import play.api.i18n.{I18nSupport, Lang, MessagesApi, Messages}
+import play.api.i18n.{I18nSupport, Lang, Messages, MessagesApi}
 import play.api.mvc._
 import models._
 import java.sql.Connection
+
+import helpers.Ogp
 import play.api.db.DBApi
 import play.api.i18n.{I18nSupport, Messages => msg}
 
@@ -103,7 +108,8 @@ class HomeController @Inject()(
               Article.showWithComment(ArticleId(id)),
               TimeZoneSupport.formatter(msg("publishDateFormatInArticleList")),
               toLocalDateTime(_)(implicitly),
-              formWithError
+              formWithError,
+              Ogp.thumbnail(ArticleId(id))
             )
           )
         }
@@ -173,7 +179,8 @@ class HomeController @Inject()(
           Article.showWithComment(ArticleId(id)),
           TimeZoneSupport.formatter(msg("publishDateFormatInArticleList")),
           toLocalDateTime(_)(implicitly),
-          commentForm
+          commentForm,
+          Ogp.thumbnail(ArticleId(id))
         )
       )
     }
