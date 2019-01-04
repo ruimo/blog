@@ -24,7 +24,7 @@
   <meta property="og:description" content="@Ogp.description(rec._1.body)" />
   <meta property="og:site_name" content="@settings.SiteTitle" />
   @thumbnail.map { t =>
-    <meta property="og:image" content="@routes.FileController.getImage(t.value)" />
+    <meta property="og:image" content="@settings.SiteLink@routes.FileController.getImage(t.value)" />
   }.getOrElse("")
   <script src="@routes.Assets.versioned("javascripts/index.js")"></script>
   <script src="@routes.Assets.versioned("javascripts/comment.js")"></script>
