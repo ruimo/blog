@@ -50,10 +50,13 @@ dl {
 }
 
 .sns .facebook {
-    margin-top: 3px;
     vertical-align: top;
 }
 
 .publishDate {
     padding: 3px;
+}
+
+.sns .twitter {
+    margin-top:3px;
 }
