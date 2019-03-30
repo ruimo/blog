@@ -3,22 +3,28 @@ package controllers
 import play.api.data._
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, Lang, MessagesApi, Messages => msg}
-import play.api.libs.json.{Json, JsString}
+import play.api.libs.json.{JsString, Json}
 import javax.inject._
 import play.api._
 import play.api.db.DBApi
 import play.api.mvc._
-import java.time.{Instant, ZoneOffset, ZoneId, LocalDateTime}
+import java.time.{Instant, LocalDateTime, ZoneId, ZoneOffset}
 import java.time.ZoneOffset.UTC
+
 import models._
+
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class ArticleController @Inject() (
-  val messagesApi: MessagesApi,
+  parsers: PlayBodyParsers,
+  cc: ControllerComponents,
+  implicit val ec: ExecutionContext,
   implicit val settings: Settings,
   dbApi: DBApi,
   val bloggerRepo: BloggerRepo
-) extends Controller with I18nSupport with AuthenticatedSupport with TimeZoneSupport {
+) extends AbstractController(cc) with I18nSupport with AuthenticatedSupport with TimeZoneSupport {
+  val logger = Logger(getClass)
   val db = dbApi.database("default")
 
   def articleForm(id: ArticleId, bloggerId: BloggerId)(implicit req: RequestHeader) = {
@@ -45,7 +51,7 @@ class ArticleController @Inject() (
     single("id" -> longNumber)
   )
 
-  def startCreate = authenticated { implicit req =>
+  def startCreate = authenticated(parsers.anyContent) { implicit req =>
     db.withConnection { implicit conn =>
       val id = Article.createId()
       val bloggerId = BloggerId(req.user.session.bloggerId)
@@ -58,7 +64,7 @@ class ArticleController @Inject() (
     }
   }
 
-  def create(id: Long) = authenticated { implicit req =>
+  def create(id: Long) = authenticated(parsers.anyContent) { implicit req =>
     val bloggerId = BloggerId(req.user.session.bloggerId)
     val form = articleForm(ArticleId(id), bloggerId).bindFromRequest
 
@@ -84,7 +90,7 @@ class ArticleController @Inject() (
     )
   }
 
-  def updateStart(id: Long) = authenticated { implicit req =>
+  def updateStart(id: Long) = authenticated(parsers.anyContent) { implicit req =>
     val bloggerId = BloggerId(req.user.session.bloggerId)
     val articleId = ArticleId(id)
 
@@ -98,7 +104,7 @@ class ArticleController @Inject() (
     }
   }
 
-  def update(id: Long) = authenticated { implicit req =>
+  def update(id: Long) = authenticated(parsers.anyContent) { implicit req =>
     val bloggerId = BloggerId(req.user.session.bloggerId)
     val form = articleForm(ArticleId(id), bloggerId).bindFromRequest
 
@@ -124,10 +130,10 @@ class ArticleController @Inject() (
     )
   }
 
-  def remove() = authenticated { implicit req =>
+  def remove() = authenticated(parsers.anyContent) { implicit req =>
     removeForm.bindFromRequest.fold(
       formWithError => {
-        Logger.error("ArticleController.remove() validation error " + formWithError)
+        logger.error("ArticleController.remove() validation error " + formWithError)
         Redirect(routes.HomeController.index()).flashing("message" -> msg("unknownError"))
       },
       id => {
@@ -139,10 +145,10 @@ class ArticleController @Inject() (
     )
   }
 
-  def removeComment() = authenticated { implicit req =>
+  def removeComment() = authenticated(parsers.anyContent) { implicit req =>
     removeForm.bindFromRequest.fold(
       formWithError => {
-        Logger.error("ArticleController.removeComment() validation error " + formWithError)
+        logger.error("ArticleController.removeComment() validation error " + formWithError)
         Redirect(routes.HomeController.index()).flashing("message" -> msg("unknownError"))
       },
       id => {
@@ -154,10 +160,10 @@ class ArticleController @Inject() (
     )
   }
 
-  def authorizeComment() = authenticated { implicit req =>
+  def authorizeComment() = authenticated(parsers.anyContent) { implicit req =>
     authorizeCommentForm.bindFromRequest.fold(
       formWithError => {
-        Logger.error("ArticleController.authorizeComment() validation error " + formWithError)
+        logger.error("ArticleController.authorizeComment() validation error " + formWithError)
         Redirect(routes.HomeController.index()).flashing("message" -> msg("unknownError"))
       },
       id => {

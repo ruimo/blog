@@ -2,32 +2,39 @@ package controllers
 
 import play.api.i18n.Messages
 import java.net.URLDecoder
+
 import play.api.data._
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, Lang, MessagesApi}
-import play.api.libs.json.{Json, JsString}
+import play.api.libs.json.{JsString, Json}
 import javax.inject._
 import play.api._
 import play.api.db.DBApi
 import play.api.mvc._
-import java.time.{Instant, ZoneOffset, ZoneId, LocalDateTime}
+import java.time.{Instant, LocalDateTime, ZoneId, ZoneOffset}
 import java.time.ZoneOffset.UTC
+
 import helpers.PasswordHash
 import helpers.Sanitizer
 import models._
+
+import scala.concurrent.ExecutionContext
 
 case class Login(userName: String, password: String)
 case class ChangePassword(currentPassword: String, newPasswords: (String, String))
 
 @Singleton
 class BloggerController @Inject() (
-  val messagesApi: MessagesApi,
+  parsers: PlayBodyParsers,
   implicit val settings: Settings,
+  implicit val ec: ExecutionContext,
   dbApi: DBApi,
   val bloggerRepo: BloggerRepo,
-  passwordHash: PasswordHash
-) extends Controller with I18nSupport with AuthenticatedSupport {
+  passwordHash: PasswordHash,
+  cc: ControllerComponents
+) extends AbstractController(cc) with I18nSupport with AuthenticatedSupport {
   val db = dbApi.database("default")
+  val logger = Logger(getClass)
 
   val loginForm = Form(
     mapping(
@@ -49,20 +56,20 @@ class BloggerController @Inject() (
   )
 
   def startLogin(url: String) = Action { implicit req =>
-    Logger.info("StartLogin(" + url + ")")
+    logger.info("StartLogin(" + url + ")")
     db.withConnection { implicit conn =>
       val count = bloggerRepo.count()
       if (count == 0) {
-        Logger.info("No bloggers found. Creating first blogger.")
+        logger.info("No bloggers found. Creating first blogger.")
         val password = passwordHash.password()
         val (salt, hash) = passwordHash.generateWithSalt(password)
         val blogger = bloggerRepo.create(
           name = bloggerRepo.AdminName, "admin", None, "manager", "set@your.email", hash, salt
         )
 
-        Logger.info("--------------------")
-        Logger.info("Your first blogger '" + blogger.name + "' has password '" + password + "'")
-        Logger.info("--------------------")
+        logger.info("--------------------")
+        logger.info("Your first blogger '" + blogger.name + "' has password '" + password + "'")
+        logger.info("--------------------")
 
         Ok(
           views.html.login(
@@ -82,7 +89,7 @@ class BloggerController @Inject() (
  def login(url: String) = Action { implicit req =>
     loginForm.bindFromRequest.fold(
       formWithError => {
-        Logger.error("UserController.login validation error " + formWithError)
+        logger.error("UserController.login validation error " + formWithError)
         BadRequest(views.html.login(formWithError, url))
       },
       login => db.withConnection { implicit conn =>
@@ -97,18 +104,18 @@ class BloggerController @Inject() (
     )
   }
 
-  def logoff = authenticated { implicit req =>
+  def logoff = authenticated(parsers.anyContent) { implicit req =>
     Redirect(routes.HomeController.index()).withSession(req.session - LoginSession.LoginSessionKey)
   }
 
-  def changePasswordStart = authenticated { implicit req =>
+  def changePasswordStart = authenticated(parsers.anyContent) { implicit req =>
     Ok(views.html.changePassword(changePasswordForm))
   }
 
-  def changePassword = authenticated { implicit req =>
+  def changePassword = authenticated(parsers.anyContent) { implicit req =>
     changePasswordForm.bindFromRequest.fold(
       formWithError => {
-        Logger.error("BloggerController.changePassword validation error: " + formWithError)
+        logger.error("BloggerController.changePassword validation error: " + formWithError)
         BadRequest(
           views.html.changePassword(formWithError)
         )

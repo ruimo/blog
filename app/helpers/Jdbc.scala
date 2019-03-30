@@ -4,20 +4,22 @@ import java.sql.{Connection, SQLException}
 import play.api.Logger
 
 object Jdbc {
+  val logger = Logger(getClass)
+
   def closeThrowingNothing(conn: Connection) {
     try {
       conn.close()
-      Logger.info("Connection closed. " + conn)
+      logger.info("Connection closed. " + conn)
     }
     catch {
       case e: SQLException =>
-        Logger.error("Connection close error. " + conn)
+        logger.error("Connection close error. " + conn)
     }
   }
 
   def rollbackThrowing(conn: Connection, cause: Throwable): Throwable = try {
     conn.rollback()
-    Logger.info("Connection rollbacked. " + conn)
+    logger.info("Connection rollbacked. " + conn)
     cause
   }
   catch {

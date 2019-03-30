@@ -1,6 +1,6 @@
 package controllers
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, ExecutionContext}
 import play.api.libs.ws._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -27,24 +27,26 @@ import play.api.i18n.{I18nSupport, Messages => msg}
 
 @Singleton
 class HomeController @Inject()(
-  val messagesApi: MessagesApi,
+  implicit val ec: ExecutionContext,
+  cc: ControllerComponents,
   dbApi: DBApi,
   val bloggerRepo: BloggerRepo,
   implicit val settings: Settings,
   actorSystem: ActorSystem,
   mailerClient: MailerClient,
   ws: WSClient
-) extends Controller with I18nSupport with AuthenticatedSupport with TimeZoneSupport {
+) extends AbstractController(cc) with I18nSupport with AuthenticatedSupport with TimeZoneSupport {
   val db = dbApi.database("default")
+  val logger = Logger(getClass)
 
   val isRecaptchaValid: String => Boolean = recaptcha => {
-    Logger.info("recaptcha string: " + recaptcha)
+    logger.info("recaptcha string: " + recaptcha)
     val req = ws.url(settings.recaptcha.url)
       .post(Map("secret" -> Seq(settings.recaptcha.secret), "response" -> Seq(recaptcha)))
     val jsonResp = Json.parse(Await.result(req, 10.seconds).body)
-    Logger.info("recaptcha response: " + jsonResp)
+    logger.info("recaptcha response: " + jsonResp)
     val isSuccess: Boolean = (jsonResp \ "success").as[Boolean]
-    Logger.info("isSuccess: " + isSuccess)
+    logger.info("isSuccess: " + isSuccess)
     isSuccess
   }
 
@@ -101,7 +103,7 @@ class HomeController @Inject()(
     val form = commentForm.bindFromRequest
     form.fold(
       formWithError => {
-        Logger.error("HomeController.postComment(" + id + ") validation error " + formWithError)
+        logger.error("HomeController.postComment(" + id + ") validation error " + formWithError)
         db.withConnection { implicit conn =>
           BadRequest(
             views.html.showArticleWithComment(
@@ -127,7 +129,7 @@ class HomeController @Inject()(
             bodyText = Some(views.html.mail.commentPosted(articleId, newComment).toString)
           )
           mailerClient.send(email)
-        }
+        }(ec)
 
         Redirect(
           routes.HomeController.showArticleById(id)
@@ -161,7 +163,7 @@ class HomeController @Inject()(
             bodyText = Some(views.html.mail.commentPosted(articleId, newComment).toString)
           )
           mailerClient.send(email)
-        }
+        }(ec)
 
         Ok(
           Json.obj(

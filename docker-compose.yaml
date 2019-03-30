@@ -1,0 +1,15 @@
+version: '3'
+services:
+  app:
+    image: "ruimo/blog:latest"
+    user: $UID
+    ports:
+     - "$PUBLISH_PORT:9000"
+    restart: always
+    volumes:
+     - /home/blog:/root
+     - /etc/timezone:/etc/timezone:ro
+     - /var/log/blog:/var/log
+    environment:
+     - APP_SECRET
+     - BLOG_OPT

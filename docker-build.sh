@@ -1,3 +1,3 @@
 #!/bin/sh
-bin/activator universal:packageZipTarball
+sbt universal:packageZipTarball
 docker build --no-cache -t ruimo/blog .

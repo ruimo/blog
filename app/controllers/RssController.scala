@@ -2,27 +2,32 @@ package controllers
 
 import akka.util.ByteString
 import play.twirl.api.Xml
-import play.api.libs.json.{Json, JsString}
+import play.api.libs.json.{JsString, Json}
 import play.api.data._
 import play.api.data.Forms._
 import javax.inject._
+
 import scala.collection.{immutable => imm}
 import play.api._
 import play.api.i18n.{I18nSupport, Lang, MessagesApi}
 import play.api.mvc._
 import models._
 import java.sql.Connection
+
 import play.api.db.DBApi
 import play.api.i18n.{I18nSupport, Messages => msg}
 import play.api.http.Writeable
 
+import scala.concurrent.ExecutionContext
+
 @Singleton
 class RssController @Inject()(
-  val messagesApi: MessagesApi,
+  cc: ControllerComponents,
+  implicit val ec: ExecutionContext,
   dbApi: DBApi,
   val bloggerRepo: BloggerRepo,
   settings: Settings
-) extends Controller with I18nSupport with AuthenticatedSupport with TimeZoneSupport {
+) extends AbstractController(cc) with I18nSupport with AuthenticatedSupport with TimeZoneSupport {
   val db = dbApi.database("default")
 
   val xmlWriteable = new Writeable[Xml](
