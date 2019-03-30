@@ -13,8 +13,8 @@
 
 @form(action = CSRF(routes.HomeController.postComment(articleId.value)), 'class -> "commentForm") {
   <input type="hidden" name="articleId" value="@articleId.value">
-  @inputText(commentForm("namae"), 'size -> 64, '_showConstraints -> false, '_label -> null, 'placeholder -> msg("courtegyName"))
-  @textarea(commentForm("comment"), 'rows -> 5, 'cols -> 80, '_showConstraints -> false, '_label -> null, 'placeholder -> msg("comment"))
+  @inputText(commentForm("namae"), 'size -> 64, '_showConstraints -> false, '_label -> "", 'placeholder -> msg("courtegyName"))
+  @textarea(commentForm("comment"), 'rows -> 5, 'cols -> 80, '_showConstraints -> false, '_label -> "", 'placeholder -> msg("comment"))
   @commentForm.errors("g-recaptcha-response").map { e =>
     <div class="error">@msg(e.message)</div>
   }
