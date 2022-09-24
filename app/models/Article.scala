@@ -88,27 +88,38 @@ object Article {
   )
 
   def list(
-    page: Int = 0, pageSize: Int = 10, orderBy: OrderBy = OrderBy("publish_time", Desc), now: Long = System.currentTimeMillis
+    page: Int = 0, pageSize: Int = 10, orderBy: OrderBy = OrderBy("publish_time", Desc),
+    now: Long = System.currentTimeMillis, tagName: Option[String] = None
   )(
     implicit conn: Connection
   ): PagedRecords[Article] = {
     import scala.language.postfixOps
 
     val offset: Int = pageSize * page
+    val where = """
+      where publish_time <= {now}
+    """ + tagName.map { tag =>
+      "and article_id in (select article_id from article_tag where tag_name = {tagName})"
+    }.getOrElse("")
+
     val records: Seq[Article] = SQL(
-      s"select * from article where publish_time <= {now} order by $orderBy limit {pageSize} offset {offset}"
+      "select * from article " + where + s"""
+      order by $orderBy limit {pageSize} offset {offset}
+      """
     ).on(
       'now -> Instant.ofEpochMilli(now),
       'pageSize -> pageSize,
-      'offset -> offset
+      'offset -> offset,
+      'tagName -> tagName.getOrElse("")
     ).as(
       simple *
     )
 
     val count = SQL(
-      "select count(*) from article where publish_time <= {now}"
+      "select count(*) from article " + where
     ).on(
-      'now -> Instant.ofEpochMilli(now)
+      'now -> Instant.ofEpochMilli(now),
+      'tagName -> tagName.getOrElse("")
     ).as(SqlParser.scalar[Long].single)
 
     PagedRecords(page, pageSize, (count + pageSize - 1) / pageSize, orderBy, records)
@@ -120,17 +131,21 @@ object Article {
 
   def listFrom(
     page: Int = 0, pageSize: Int = 10, orderBy: OrderBy = OrderBy("publish_time", Desc),
-    now: Long = System.currentTimeMillis, fromId: ArticleId
+    now: Long = System.currentTimeMillis, fromId: ArticleId, tagName: Option[String] = None
   )(
     implicit conn: Connection
   ): PagedRecords[Article] = {
     import scala.language.postfixOps
 
     val offset: Int = pageSize * page
-    val records: Seq[Article] = SQL(
-      s"""
-      select * from article
+    val where = """
       where publish_time <= (select publish_time from article where article_id = {fromId})
+    """ + tagName.map { tag =>
+      "and article_id in (select article_id from article_tag where tag_name = {tagName})"
+    }.getOrElse("")
+
+    val records: Seq[Article] = SQL(
+      "select * from article" + where + s"""
       and publish_time <= {now}
       order by $orderBy limit {pageSize} offset {offset}
       """
@@ -138,15 +153,18 @@ object Article {
       'now -> Instant.ofEpochMilli(now),
       'pageSize -> pageSize,
       'offset -> offset,
-      'fromId -> fromId.value
+      'fromId -> fromId.value,
+      'tagName -> tagName.getOrElse("")
     ).as(
       simple *
     )
 
     val count = SQL(
-      "select count(*) from article where publish_time <= {now}"
+      "select count(*) from article " + where
     ).on(
-      'now -> Instant.ofEpochMilli(now)
+      'now -> Instant.ofEpochMilli(now),
+      'fromId -> fromId.value,
+      'tagName -> tagName.getOrElse("")
     ).as(SqlParser.scalar[Long].single)
 
     PagedRecords(page, pageSize, (count + pageSize - 1) / pageSize, orderBy, records)
@@ -154,18 +172,23 @@ object Article {
 
   def listWithComment(
     page: Int = 0, pageSize: Int = 10, orderBy: OrderBy = OrderBy("publish_time", Desc),
-    now: Long = System.currentTimeMillis, commentsPerArticle: Int = 5
+    now: Long = System.currentTimeMillis, commentsPerArticle: Int = 5, tagName: Option[String] = None
   )(
     implicit conn: Connection
   ): PagedRecords[(Article, imm.Seq[Comment])] = {
     import scala.language.postfixOps
 
     val offset: Int = pageSize * page
+    val where = """
+      where publish_time <= {now}
+    """ + tagName.map { tag =>
+      "and a0.article_id in (select article_id from article_tag where tag_name = {tagName})"
+    }.getOrElse("")
     val recs: List[(Article, Option[Comment])] = SQL(
-      s"""
+      """
       select * from article a0
       left join comment c0 on a0.article_id = c0.article_id
-      where a0.publish_time <= {now}
+      """ + where + s"""
       and (
         c0.comment_id in (
           select comment_id from comment c1 where c0.article_id = c1.article_id order by c1.created_time limit {commentsPerArticle}
@@ -179,12 +202,13 @@ object Article {
       'now -> Instant.ofEpochMilli(now),
       'commentsPerArticle -> commentsPerArticle,
       'pageSize -> pageSize,
-      'offset -> offset
+      'offset -> offset,
+      'tagName -> tagName.getOrElse("")
     ).as(
       withComment *
     )
 
-    accumRecords(page, pageSize, orderBy, now, recs)
+    accumRecords(page, pageSize, orderBy, now, recs, where, tagName)
   }
 
   def articleWithCommentSql(where: String) = s"""
@@ -202,15 +226,20 @@ object Article {
 
   def listWithCommentFrom(
     page: Int = 0, pageSize: Int = 10, orderBy: OrderBy = OrderBy("publish_time", Desc),
-    now: Long = System.currentTimeMillis, commentsPerArticle: Int = 5, fromId: ArticleId
+    now: Long = System.currentTimeMillis, commentsPerArticle: Int = 5, fromId: ArticleId, tagName: Option[String] = None
   )(
     implicit conn: Connection
   ): PagedRecords[(Article, imm.Seq[Comment])] = {
     import scala.language.postfixOps
 
     val offset: Int = pageSize * page
+    val where = """
+      where a0.publish_time <= (select publish_time from article where article_id = {fromId})
+    """ + tagName.map { tag =>
+      "and a0.article_id in (select article_id from article_tag where tag_name = {tagName})"
+    }.getOrElse("")
     val recs: List[(Article, Option[Comment])] = SQL(
-      articleWithCommentSql("a0.publish_time <= (select publish_time from article where article_id = {fromId})") +
+      articleWithCommentSql(where) +
       s"""
       order by $orderBy, c0.created_time desc
       limit {pageSize} offset {offset}
@@ -220,12 +249,13 @@ object Article {
       'commentsPerArticle -> commentsPerArticle,
       'pageSize -> pageSize,
       'offset -> offset,
-      'fromId -> fromId.value
+      'fromId -> fromId.value,
+      'tagName -> tagName.getOrElse("")
     ).as(
       withComment *
     )
 
-    accumRecords(page, pageSize, orderBy, now, recs)
+    accumRecords(page, pageSize, orderBy, now, recs, where, tagName)
   }
 
   def showWithComment(
@@ -252,7 +282,8 @@ object Article {
   }
 
   def accumRecords(
-    page: Int, pageSize: Int, orderBy: OrderBy, now: Long, recs: List[(Article, Option[Comment])]
+    page: Int, pageSize: Int, orderBy: OrderBy, now: Long, recs: List[(Article, Option[Comment])],
+    where: String, tagName: Option[String]
   )(implicit conn: Connection): PagedRecords[(Article, Seq[Comment])] = {
     if (recs.isEmpty) {
       PagedRecords(page, pageSize, 0, orderBy, imm.Seq())
@@ -276,9 +307,10 @@ object Article {
       }
 
       val count = SQL(
-        "select count(*) from article where publish_time <= {now}"
+        "select count(*) from article a0" + where
       ).on(
-        'now -> Instant.ofEpochMilli(now)
+        'now -> Instant.ofEpochMilli(now),
+        'tagName -> tagName.getOrElse("")
       ).as(SqlParser.scalar[Long].single)
 
       PagedRecords(page, pageSize, (count + pageSize - 1) / pageSize, orderBy, accum(recs, recs.head._1, Vector()))

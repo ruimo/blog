@@ -26,3 +26,5 @@ libraryDependencies ++= Seq(
   specs2 % Test
 )
 
+fork in Test := true
+parallelExecution in Test := false
