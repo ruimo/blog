@@ -234,7 +234,7 @@ object Article {
 
     val offset: Int = pageSize * page
     val where = """
-      where a0.publish_time <= (select publish_time from article where article_id = {fromId})
+      a0.publish_time <= (select publish_time from article where article_id = {fromId})
     """ + tagName.map { tag =>
       "and a0.article_id in (select article_id from article_tag where tag_name = {tagName})"
     }.getOrElse("")
