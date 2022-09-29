@@ -208,7 +208,7 @@ object Article {
       withComment *
     )
 
-    accumRecords(page, pageSize, orderBy, now, recs, where, tagName)
+    accumRecords(page, pageSize, orderBy, now, recs, where, tagName, None)
   }
 
   def articleWithCommentSql(where: String) = s"""
@@ -255,7 +255,7 @@ object Article {
       withComment *
     )
 
-    accumRecords(page, pageSize, orderBy, now, recs, where, tagName)
+    accumRecords(page, pageSize, orderBy, now, recs, where, tagName, Some(fromId))
   }
 
   def showWithComment(
@@ -283,7 +283,7 @@ object Article {
 
   def accumRecords(
     page: Int, pageSize: Int, orderBy: OrderBy, now: Long, recs: List[(Article, Option[Comment])],
-    where: String, tagName: Option[String]
+    where: String, tagName: Option[String], fromId: Option[ArticleId]
   )(implicit conn: Connection): PagedRecords[(Article, Seq[Comment])] = {
     if (recs.isEmpty) {
       PagedRecords(page, pageSize, 0, orderBy, imm.Seq())
@@ -306,11 +306,23 @@ object Article {
           else accum(t, h._1, h._2.toVector, result :+(article, comments))
       }
 
+      import scala.language.postfixOps
+
+      val fromIdParm: Seq[NamedParameter] = fromId match {
+        case None => Seq()
+        case Some(articleId) => Seq('fromId -> articleId.value)
+      }
+
       val count = SQL(
-        "select count(*) from article a0" + where
+        "select count(*) from article a0" + fromId.map(articleId => " where").getOrElse("") + where
       ).on(
-        'now -> Instant.ofEpochMilli(now),
-        'tagName -> tagName.getOrElse("")
+        (
+          Seq[NamedParameter](
+            'now -> Instant.ofEpochMilli(now),
+            'tagName -> tagName.getOrElse("")
+          )
+          ++ fromIdParm
+        ) : _*
       ).as(SqlParser.scalar[Long].single)
 
       PagedRecords(page, pageSize, (count + pageSize - 1) / pageSize, orderBy, accum(recs, recs.head._1, Vector()))
