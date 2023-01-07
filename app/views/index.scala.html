@@ -48,7 +48,7 @@
             </div>
             @if(loginBlogger.isDefined) {
               <div class="edit">
-                <button type="button" class="button" onclick="location.href='@routes.ArticleController.updateStart(article.id.value);'">
+                <button type="button" class="button" onclick="location.href='@routes.ArticleController.updateStart(article.id.value)'">
                   @msg("edit")
                 </button>
               </div>

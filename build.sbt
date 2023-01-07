@@ -10,7 +10,7 @@ scalaVersion := "2.12.8"
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
-resolvers += "ruimo.com" at "http://static.ruimo.com/release"
+resolvers += "ruimo.com" at "https://static.ruimo.com/release"
 
 libraryDependencies ++= Seq(
   jdbc,
