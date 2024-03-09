@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk8:latest
+FROM azul/zulu-openjdk:17
 MAINTAINER Shisei Hanai<shanai@jp.ibm.com>
 
 RUN apt-get update
