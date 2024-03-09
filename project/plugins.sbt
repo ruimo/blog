@@ -1,3 +1,5 @@
+addSbtPlugin("com.github.sbt" % "sbt-release" % "1.3.0")
+
 // The Play plugin
 addSbtPlugin("org.playframework" % "sbt-plugin" % "3.0.2")
 

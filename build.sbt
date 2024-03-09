@@ -1,7 +1,5 @@
 name := """blog-server"""
 
-version := "1.0-SNAPSHOT"
-
 maintainer := "ruimo.uno@gmail.com"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
