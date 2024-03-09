@@ -5,7 +5,7 @@ on:
     - '*'
 
 jobs:
-  build-snapshot:
+  build-tag:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -23,7 +23,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build Docker Image
         run: |
-          docker build --tag ghcr.io/$GITHUB_ACTOR/blog:${{ github.ref }} .
+          docker build ghcr.io/$GITHUB_ACTOR/blog:${{ github.ref }} .
       - name: Push Docker Image
         run: |
           docker push ghcr.io/$GITHUB_ACTOR/blog:${{ github.ref }}
