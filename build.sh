@@ -1,2 +1,2 @@
 #!/bin/sh
-sbt universal:packageZipTarball
+sbt test universal:packageZipTarball

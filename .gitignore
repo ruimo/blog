@@ -10,3 +10,9 @@ target
 settings.conf
 withmail.sh
 **/#*
+.bloop/
+.bsp/
+.github/
+.metals/
+.vscode/
+metals.sbt
