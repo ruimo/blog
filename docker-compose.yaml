@@ -1,7 +1,7 @@
 version: '3'
 services:
   app:
-    image: "ruimo/blog:${GIT_TAG-latest}"
+    image: "ghcr.io/ruimo/blog:${GIT_TAG-latest}"
     user: $UID
     ports:
      - "$PUBLISH_PORT:9000"
