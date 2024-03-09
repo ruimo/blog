@@ -23,7 +23,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build Docker Image
         run: |
-          docker build ghcr.io/$GITHUB_ACTOR/blog:${{ github.ref }} .
+          docker build -t ghcr.io/$GITHUB_ACTOR/blog:${{ github.ref }} .
       - name: Push Docker Image
         run: |
           docker push ghcr.io/$GITHUB_ACTOR/blog:${{ github.ref }}
