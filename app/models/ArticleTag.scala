@@ -25,7 +25,7 @@ object ArticleTag {
     }
   }
 
-  def create(articleId: ArticleId, tagName: String)(implicit conn: Connection) {
+  def create(articleId: ArticleId, tagName: String)(implicit conn: Connection): Unit = {
     SQL(
       """
       insert into article_tag(
@@ -35,8 +35,8 @@ object ArticleTag {
       )
       """
     ).on(
-      'articleId -> articleId.value,
-      'tagName -> tagName
+      "articleId" -> articleId.value,
+      "tagName" -> tagName
     ).executeUpdate()
 
     val id = SQL("select currval('article_tag_seq')").as(SqlParser.scalar[Long].single)
@@ -51,9 +51,9 @@ object ArticleTag {
       select * from article_tag where article_id = {articleId} order by tag_name
       """
     ).on(
-      'articleId -> articleId.value
+      "articleId" -> articleId.value
     ).as(
-      simple *
+      simple.*
     )
   }
 }

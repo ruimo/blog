@@ -6,7 +6,7 @@ import play.api.mvc.RequestHeader
 import play.api.mvc.Result
 
 case class LoginSession(bloggerId: Long, expirationTime: Long) {
-  val serialized = bloggerId + ";" + expirationTime
+  val serialized = s"${bloggerId};${expirationTime}"
   def isExpired(now: Long = System.currentTimeMillis): Boolean = now > expirationTime
   def renewExpirationTime(now: Long = System.currentTimeMillis): LoginSession = copy(
     expirationTime = now + LoginSession.SessionTimeout.toMillis

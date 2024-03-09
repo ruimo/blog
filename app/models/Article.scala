@@ -38,7 +38,7 @@ object Article {
     ArticleId(SQL("select nextval('article_seq')").as(SqlParser.scalar[Long].single))
   }
 
-  def create(article: Article)(implicit conn: Connection) {
+  def create(article: Article)(implicit conn: Connection): Unit = {
     SQL(
       """
       insert into article(
@@ -48,16 +48,16 @@ object Article {
       )
       """
     ).on(
-      'id -> article.id.value,
-      'title -> article.title,
-      'body -> article.body,
-      'bloggerId -> article.bloggerId.value,
-      'publishTime -> Instant.ofEpochMilli(article.publishTime),
-      'createdTime -> Instant.ofEpochMilli(article.createdTime)
+      "id" -> article.id.value,
+      "title" -> article.title,
+      "body" -> article.body,
+      "bloggerId" -> article.bloggerId.value,
+      "publishTime" -> Instant.ofEpochMilli(article.publishTime),
+      "createdTime" -> Instant.ofEpochMilli(article.createdTime)
     ).executeUpdate()
   }
 
-  def update(article: Article)(implicit conn: Connection) {
+  def update(article: Article)(implicit conn: Connection): Unit = {
     SQL(
       """
       update article set 
@@ -69,11 +69,11 @@ object Article {
       where article_id = {id}
       """
     ).on(
-      'title -> article.title,
-      'body -> article.body,
-      'bloggerId -> article.bloggerId.value,
-      'publishTime -> Instant.ofEpochMilli(article.publishTime),
-      'id -> article.id.value
+      "title" -> article.title,
+      "body" -> article.body,
+      "bloggerId" -> article.bloggerId.value,
+      "publishTime" -> Instant.ofEpochMilli(article.publishTime),
+      "id" -> article.id.value
     ).executeUpdate()
   }
 
@@ -82,7 +82,7 @@ object Article {
     select * from article where article_id = {id}
     """
   ).on(
-    'id -> id.value
+    "id" -> id.value
   ).as(
     simple.singleOpt
   )
@@ -107,19 +107,19 @@ object Article {
       order by $orderBy limit {pageSize} offset {offset}
       """
     ).on(
-      'now -> Instant.ofEpochMilli(now),
-      'pageSize -> pageSize,
-      'offset -> offset,
-      'tagName -> tagName.getOrElse("")
+      "now" -> Instant.ofEpochMilli(now),
+      "pageSize" -> pageSize,
+      "offset" -> offset,
+      "tagName" -> tagName.getOrElse("")
     ).as(
-      simple *
+      simple.*
     )
 
     val count = SQL(
       "select count(*) from article " + where
     ).on(
-      'now -> Instant.ofEpochMilli(now),
-      'tagName -> tagName.getOrElse("")
+      "now" -> Instant.ofEpochMilli(now),
+      "tagName" -> tagName.getOrElse("")
     ).as(SqlParser.scalar[Long].single)
 
     PagedRecords(page, pageSize, (count + pageSize - 1) / pageSize, orderBy, records)
@@ -150,21 +150,21 @@ object Article {
       order by $orderBy limit {pageSize} offset {offset}
       """
     ).on(
-      'now -> Instant.ofEpochMilli(now),
-      'pageSize -> pageSize,
-      'offset -> offset,
-      'fromId -> fromId.value,
-      'tagName -> tagName.getOrElse("")
+      "now" -> Instant.ofEpochMilli(now),
+      "pageSize" -> pageSize,
+      "offset" -> offset,
+      "fromId" -> fromId.value,
+      "tagName" -> tagName.getOrElse("")
     ).as(
-      simple *
+      simple.*
     )
 
     val count = SQL(
       "select count(*) from article " + where
     ).on(
-      'now -> Instant.ofEpochMilli(now),
-      'fromId -> fromId.value,
-      'tagName -> tagName.getOrElse("")
+      "now" -> Instant.ofEpochMilli(now),
+      "fromId" -> fromId.value,
+      "tagName" -> tagName.getOrElse("")
     ).as(SqlParser.scalar[Long].single)
 
     PagedRecords(page, pageSize, (count + pageSize - 1) / pageSize, orderBy, records)
@@ -199,13 +199,13 @@ object Article {
       limit {pageSize} offset {offset}
       """
     ).on(
-      'now -> Instant.ofEpochMilli(now),
-      'commentsPerArticle -> commentsPerArticle,
-      'pageSize -> pageSize,
-      'offset -> offset,
-      'tagName -> tagName.getOrElse("")
+      "now" -> Instant.ofEpochMilli(now),
+      "commentsPerArticle" -> commentsPerArticle,
+      "pageSize" -> pageSize,
+      "offset" -> offset,
+      "tagName" -> tagName.getOrElse("")
     ).as(
-      withComment *
+      withComment.*
     )
 
     accumRecords(page, pageSize, orderBy, now, recs, where, tagName, None)
@@ -245,14 +245,14 @@ object Article {
       limit {pageSize} offset {offset}
       """
     ).on(
-      'now -> Instant.ofEpochMilli(now),
-      'commentsPerArticle -> commentsPerArticle,
-      'pageSize -> pageSize,
-      'offset -> offset,
-      'fromId -> fromId.value,
-      'tagName -> tagName.getOrElse("")
+      "now" -> Instant.ofEpochMilli(now),
+      "commentsPerArticle" -> commentsPerArticle,
+      "pageSize" -> pageSize,
+      "offset" -> offset,
+      "fromId" -> fromId.value,
+      "tagName" -> tagName.getOrElse("")
     ).as(
-      withComment *
+      withComment.*
     )
 
     accumRecords(page, pageSize, orderBy, now, recs, where, tagName, Some(fromId))
@@ -269,11 +269,11 @@ object Article {
       articleWithCommentSql("a0.article_id = {id}") +
       "order by c0.created_time desc"
     ).on(
-      'now -> Instant.ofEpochMilli(now),
-      'commentsPerArticle -> commentsPerArticle,
-      'id -> id.value
+      "now" -> Instant.ofEpochMilli(now),
+      "commentsPerArticle" -> commentsPerArticle,
+      "id" -> id.value
     ).as(
-      withComment *
+      withComment.*
     )
 
     (
@@ -310,7 +310,7 @@ object Article {
 
       val fromIdParm: Seq[NamedParameter] = fromId match {
         case None => Seq()
-        case Some(articleId) => Seq('fromId -> articleId.value)
+        case Some(articleId) => Seq("fromId" -> articleId.value)
       }
 
       val count = SQL(
@@ -318,11 +318,11 @@ object Article {
       ).on(
         (
           Seq[NamedParameter](
-            'now -> Instant.ofEpochMilli(now),
-            'tagName -> tagName.getOrElse("")
+            "now" -> Instant.ofEpochMilli(now),
+            "tagName" -> tagName.getOrElse("")
           )
           ++ fromIdParm
-        ) : _*
+        ) *
       ).as(SqlParser.scalar[Long].single)
 
       PagedRecords(page, pageSize, (count + pageSize - 1) / pageSize, orderBy, accum(recs, recs.head._1, Vector()))
@@ -337,7 +337,7 @@ object Article {
       delete from article where article_id = {id}
       """
     ).on(
-      'id -> id.value
+      "id" -> id.value
     ).executeUpdate()
   }
 }

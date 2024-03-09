@@ -44,7 +44,7 @@
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>
 
-    @helper.form(action = helper.CSRF(routes.BloggerController.logoff()), 'id -> "logoffForm") {
+    @helper.form(action = helper.CSRF(routes.BloggerController.logoff()), Symbol("id") -> "logoffForm") {
     }
 
     <div class="header">
@@ -84,7 +84,7 @@ function googleTranslateElementInit() {
             <select id="contentsMenu">
               <option value="">@msg("contentsMenu")</option>
               <option value="location.href='@routes.FileController.index()'">@msg("fileUpload")</option>
-              <option value="location.href='@routes.ArticleController.startCreate()'">@msg("createArticle")</option>
+              <option value="location.href='@routes.ArticleController.startCreate'">@msg("createArticle")</option>
             </select>
           }.getOrElse("")
         </div>

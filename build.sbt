@@ -6,7 +6,7 @@ maintainer := "ruimo.uno@gmail.com"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
-scalaVersion := "2.12.8"
+scalaVersion := "3.4.0"
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
@@ -18,11 +18,11 @@ libraryDependencies ++= Seq(
   filters,
   evolutions,
   guice,
-  "com.ruimo" %% "scoins" % "1.22",
+  "com.ruimo" %% "scoins" % "1.29",
   "com.h2database"  %  "h2" % "1.4.193",
-  "org.playframework.anorm" %% "anorm" % "2.6.2",
-  "com.typesafe.play" %% "play-mailer" % "7.0.0",
-  "com.typesafe.play" %% "play-mailer-guice" % "7.0.0",
+  "org.playframework.anorm" %% "anorm" % "2.7.0",
+  "org.playframework" %% "play-mailer" % "10.0.0",
+  "org.playframework" %% "play-mailer-guice" % "10.0.0",
   specs2 % Test
 )
 

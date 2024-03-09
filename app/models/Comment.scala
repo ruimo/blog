@@ -42,10 +42,10 @@ object Comment {
       )
       """
     ).on(
-      'articleId -> articleId.value,
-      'name -> name,
-      'body -> body,
-      'createdTime -> Instant.ofEpochMilli(createdTime)
+      "articleId" -> articleId.value,
+      "name" -> name,
+      "body" -> body,
+      "createdTime" -> Instant.ofEpochMilli(createdTime)
     ).executeUpdate()
 
     val id = SQL("select currval('comment_seq')").as(SqlParser.scalar[Long].single)
@@ -54,11 +54,11 @@ object Comment {
     )
   }
 
-  def authorizeComment(id: CommentId)(implicit conn: Connection) {
+  def authorizeComment(id: CommentId)(implicit conn: Connection): Unit = {
     SQL(
       "update comment set authorized = true where comment_id = {id}"
     ).on(
-      'id -> id.value
+      "id" -> id.value
     ).executeUpdate()
   }
 
@@ -70,7 +70,7 @@ object Comment {
       delete from comment where comment_id = {id}
       """
     ).on(
-      'id -> id.value
+      "id" -> id.value
     ).executeUpdate()
   }
 }

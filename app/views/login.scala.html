@@ -14,9 +14,9 @@
   @myForm.globalErrors.map { error =>
     <div class="error">@error.message</div>
   }
-  @helper.form(action = helper.CSRF(routes.BloggerController.login(url)), 'class -> "loginForm") {
-    @helper.inputText(myForm("bloggerName"), 'size -> 24)
-    @helper.inputPassword(myForm("password"), 'size -> 24)
+  @helper.form(action = helper.CSRF(routes.BloggerController.login(url)), Symbol("class") -> "loginForm") {
+    @helper.inputText(myForm("bloggerName"), Symbol("size") -> 24)
+    @helper.inputPassword(myForm("password"), Symbol("size") -> 24)
 
     <input type="submit" class="loginButton button">
   }

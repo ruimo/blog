@@ -5,7 +5,6 @@ import play.api.libs.ws._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
-import akka.actor.ActorSystem
 import play.api.libs.mailer._
 import java.io.File
 
@@ -24,6 +23,7 @@ import java.sql.Connection
 import helpers.Ogp
 import play.api.db.DBApi
 import play.api.i18n.{I18nSupport, Messages => msg}
+import org.apache.pekko.actor.ActorSystem
 
 @Singleton
 class HomeController @Inject()(
@@ -31,11 +31,11 @@ class HomeController @Inject()(
   cc: ControllerComponents,
   dbApi: DBApi,
   val bloggerRepo: BloggerRepo,
-  implicit val settings: Settings,
+  val settings: Settings,
   actorSystem: ActorSystem,
   mailerClient: MailerClient,
   ws: WSClient
-) extends AbstractController(cc) with I18nSupport with AuthenticatedSupport with TimeZoneSupport {
+) extends AbstractController(cc) with I18nSupport with TimeZoneSupport {
   val db = dbApi.database("default")
   val logger = Logger(getClass)
 
@@ -67,7 +67,9 @@ class HomeController @Inject()(
     )
   )
 
-  def index(page: Int, pageSize: Int, orderBySpec: String, now: Long) = Action { implicit req =>
+  def index(page: Int, pageSize: Int, orderBySpec: String, now: Long) = Action { implicit req: Request[AnyContent] =>
+    implicit val loggedInBlogger: Option[LoginBlogger] = AuthenticatedActionBuilder.loginBlogger(req)(db, bloggerRepo)
+
     db.withConnection { implicit conn =>
       val recs: PagedRecords[(Article, imm.Seq[Comment])] = Article.listWithComment(page, pageSize, OrderBy(orderBySpec), now)
 
@@ -82,7 +84,9 @@ class HomeController @Inject()(
     }
   }
 
-  def fromId(fromId: Long, page: Int, pageSize: Int, orderBySpec: String, now: Long) = Action { implicit req =>
+  def fromId(fromId: Long, page: Int, pageSize: Int, orderBySpec: String, now: Long) = Action { implicit req: Request[AnyContent] =>
+    implicit val loggedInBlogger: Option[LoginBlogger] = AuthenticatedActionBuilder.loginBlogger(req)(db, bloggerRepo)
+
     db.withConnection { implicit conn =>
       val recs: PagedRecords[(Article, imm.Seq[Comment])] =
         Article.listWithCommentFrom(page, pageSize, OrderBy(orderBySpec), now, fromId = ArticleId(fromId))
@@ -98,9 +102,11 @@ class HomeController @Inject()(
     }
   }
 
-  def postComment(id: Long) = Action { implicit req =>
+  def postComment(id: Long) = Action { implicit req: Request[AnyContent] =>
+    implicit val loggedInBlogger: Option[LoginBlogger] = AuthenticatedActionBuilder.loginBlogger(req)(db, bloggerRepo)
+
     val articleId = ArticleId(id)
-    val form = commentForm.bindFromRequest
+    val form = commentForm.bindFromRequest()
     form.fold(
       formWithError => {
         logger.error("HomeController.postComment(" + id + ") validation error " + formWithError)
@@ -138,9 +144,11 @@ class HomeController @Inject()(
     )
   }
 
-  def postCommentJson(id: Long) = Action { implicit req =>
+  def postCommentJson(id: Long) = Action { implicit req: Request[AnyContent] =>
+    implicit val loggedInBlogger: Option[LoginBlogger] = AuthenticatedActionBuilder.loginBlogger(req)(db, bloggerRepo)
+
     val articleId = ArticleId(id)
-    val form = commentForm.bindFromRequest
+    val form = commentForm.bindFromRequest()
     form.fold(
       formWithError => {
         BadRequest(
@@ -174,13 +182,15 @@ class HomeController @Inject()(
     )
   }
 
-  def showArticle(id: Long) = Action { implicit req =>
+  def showArticle(id: Long) = Action { implicit req: Request[AnyContent] =>
     Redirect(
       routes.HomeController.showArticleById(id)
     )
   }
 
-  def showArticleById(id: Long) = Action { implicit req =>
+  def showArticleById(id: Long) = Action { implicit req: Request[AnyContent] =>
+    implicit val loggedInBlogger: Option[LoginBlogger] = AuthenticatedActionBuilder.loginBlogger(req)(db, bloggerRepo)
+
     db.withConnection { implicit conn =>
       Ok(
         views.html.showArticleWithComment(

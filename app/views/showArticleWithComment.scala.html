@@ -30,11 +30,11 @@
   <script src="@routes.Assets.versioned("javascripts/comment.js")"></script>
   <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/index.css")">
 } {
-  @helper.form(action = helper.CSRF(routes.ArticleController.remove()), 'id -> "removeArticleForm") {
+  @helper.form(action = helper.CSRF(routes.ArticleController.remove()), Symbol("id") -> "removeArticleForm") {
     <input type="hidden" class="id" name="id" value="">
   }
 
-  @helper.form(action = helper.CSRF(routes.ArticleController.removeComment()), 'id -> "removeCommentForm") {
+  @helper.form(action = helper.CSRF(routes.ArticleController.removeComment()), Symbol("id") -> "removeCommentForm") {
     <input type="hidden" class="id" name="id" value="">
   }
 
@@ -92,7 +92,7 @@
               </div>
               @if(loginBlogger.isDefined) {
                 @if(!c.authorized) {
-                  @helper.form(action = helper.CSRF(routes.ArticleController.authorizeComment()), 'class -> "authorizeCommentForm") {
+                  @helper.form(action = helper.CSRF(routes.ArticleController.authorizeComment()), Symbol("class") -> "authorizeCommentForm") {
                     <input type="hidden" class="id" name="id" value="@c.id.get.value">
                     <input type="submit" value="@msg("authorize")">
                   }

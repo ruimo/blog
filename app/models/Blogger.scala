@@ -56,13 +56,13 @@ class BloggerRepo @Inject() (
       )
       """
     ).on(
-      'name -> name,
-      'firstName -> firstName,
-      'middleName -> middleName,
-      'lastName -> lastName,
-      'email -> email,
-      'passwordHash -> passwordHash,
-      'salt -> salt
+      "name" -> name,
+      "firstName" -> firstName,
+      "middleName" -> middleName,
+      "lastName" -> lastName,
+      "email" -> email,
+      "passwordHash" -> passwordHash,
+      "salt" -> salt
     ).executeUpdate()
 
     val id = SQL("select currval('blogger_seq')").as(SqlParser.scalar[Long].single)
@@ -82,10 +82,10 @@ class BloggerRepo @Inject() (
     val records: Seq[Blogger] = SQL(
       s"select * from blogger where deleted = false order by $orderBy limit {pageSize} offset {offset}"
     ).on(
-      'pageSize -> pageSize,
-      'offset -> offset
+      "pageSize" -> pageSize,
+      "offset" -> offset
     ).as(
-      simple *
+      simple.*
     )
 
     val count = SQL(
@@ -104,7 +104,7 @@ class BloggerRepo @Inject() (
   def get(id: BloggerId)(implicit conn: Connection): Option[Blogger] = SQL(
     "select * from blogger where blogger_id = {id}"
   ).on(
-    'id -> id.value
+    "id" -> id.value
   ).as(
     simple.singleOpt
   )
@@ -112,7 +112,7 @@ class BloggerRepo @Inject() (
   def login(name: String, password: String)(implicit conn: Connection): Option[Blogger] = SQL(
     "select * from blogger where blogger_name = {name}"
   ).on(
-    'name -> name
+    "name" -> name
   ).as(
     simple.singleOpt
   ).flatMap { rec =>
@@ -137,9 +137,9 @@ class BloggerRepo @Inject() (
             where blogger_id = {id}
             """
           ).on(
-            'hash -> hash,
-            'salt -> salt,
-            'id -> blogger.id.get.value
+            "hash" -> hash,
+            "salt" -> salt,
+            "id" -> blogger.id.get.value
           ).executeUpdate()
           true
         }

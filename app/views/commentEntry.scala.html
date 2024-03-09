@@ -11,10 +11,10 @@
 
 @import helper._
 
-@form(action = CSRF(routes.HomeController.postComment(articleId.value)), 'class -> "commentForm") {
+@form(action = CSRF(routes.HomeController.postComment(articleId.value)), Symbol("class") -> "commentForm") {
   <input type="hidden" name="articleId" value="@articleId.value">
-  @inputText(commentForm("namae"), 'size -> 64, '_showConstraints -> false, '_label -> "", 'placeholder -> msg("courtegyName"))
-  @textarea(commentForm("comment"), 'rows -> 5, 'cols -> 80, '_showConstraints -> false, '_label -> "", 'placeholder -> msg("comment"))
+  @inputText(commentForm("namae"), Symbol("size") -> 64, Symbol("_showConstraints") -> false, Symbol("_label") -> "", Symbol("placeholder") -> msg("courtegyName"))
+  @textarea(commentForm("comment"), Symbol("rows") -> 5, Symbol("cols") -> 80, Symbol("_showConstraints") -> false, Symbol("_label") -> "", Symbol("placeholder") -> msg("comment"))
   @commentForm.errors("g-recaptcha-response").map { e =>
     <div class="error">@msg(e.message)</div>
   }

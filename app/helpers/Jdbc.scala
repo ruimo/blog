@@ -6,7 +6,7 @@ import play.api.Logger
 object Jdbc {
   val logger = Logger(getClass)
 
-  def closeThrowingNothing(conn: Connection) {
+  def closeThrowingNothing(conn: Connection): Unit = {
     try {
       conn.close()
       logger.info("Connection closed. " + conn)

@@ -17,7 +17,7 @@ trait TimeZoneSupport {
 }
 
 object TimeZoneSupport {
-  private[this] val map = mut.HashMap[String, DateTimeFormatter]()
+  private val map = mut.HashMap[String, DateTimeFormatter]()
 
   def formatter(pattern: String): DateTimeFormatter = map.synchronized {
     map.getOrElseUpdate(pattern, DateTimeFormatter.ofPattern(pattern))

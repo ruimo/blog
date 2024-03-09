@@ -19,24 +19,32 @@ import helpers.Sanitizer
 import models._
 
 import scala.concurrent.ExecutionContext
+import play.api.db.Database
 
 case class Login(userName: String, password: String)
+object Login {
+  def unapply(u: Login): Option[(String, String)] = Some((u.userName, u.password))
+}
 case class ChangePassword(currentPassword: String, newPasswords: (String, String))
+object ChangePassword {
+  def unapply(u: ChangePassword): Option[(String, (String, String))] = Some((u.currentPassword, u.newPasswords))
+}
 
 @Singleton
 class BloggerController @Inject() (
+  dbApi: DBApi,
+  passwordHash: PasswordHash,
+  cc: ControllerComponents,
   parsers: PlayBodyParsers,
+  implicit val bloggerRepo: BloggerRepo,
   implicit val settings: Settings,
   implicit val ec: ExecutionContext,
-  dbApi: DBApi,
-  val bloggerRepo: BloggerRepo,
-  passwordHash: PasswordHash,
-  cc: ControllerComponents
-) extends AbstractController(cc) with I18nSupport with AuthenticatedSupport {
-  val db = dbApi.database("default")
+) extends AbstractController(cc) with I18nSupport {
+  implicit val db: Database = dbApi.database("default")
   val logger = Logger(getClass)
+  val authenticated = new AuthenticatedActionBuilder(AuthenticatedActionBuilder.loginBlogger, parsers.anyContent)
 
-  val loginForm = Form(
+  val loginForm = Form[Login](
     mapping(
       "bloggerName" -> text(minLength = 8, maxLength = 24),
       "password" -> text(minLength = 8, maxLength = 24)
@@ -55,7 +63,7 @@ class BloggerController @Inject() (
     )(ChangePassword.apply)(ChangePassword.unapply)
   )
 
-  def startLogin(url: String) = Action { implicit req =>
+  def startLogin(url: String) = Action { implicit req: Request[AnyContent] =>
     logger.info("StartLogin(" + url + ")")
     db.withConnection { implicit conn =>
       val count = bloggerRepo.count()
@@ -86,8 +94,8 @@ class BloggerController @Inject() (
     }
   }
 
- def login(url: String) = Action { implicit req =>
-    loginForm.bindFromRequest.fold(
+  def login(url: String) = Action { implicit req: Request[AnyContent] =>
+    loginForm.bindFromRequest().fold(
       formWithError => {
         logger.error("UserController.login validation error " + formWithError)
         BadRequest(views.html.login(formWithError, url))
@@ -104,16 +112,19 @@ class BloggerController @Inject() (
     )
   }
 
-  def logoff = authenticated(parsers.anyContent) { implicit req =>
+  def logoff = authenticated(parsers.anyContent) { implicit req: UserRequest[AnyContent] =>
     Redirect(routes.HomeController.index()).withSession(req.session - LoginSession.LoginSessionKey)
   }
 
-  def changePasswordStart = authenticated(parsers.anyContent) { implicit req =>
+  def changePasswordStart = authenticated(parsers.anyContent) { implicit req: UserRequest[AnyContent] =>
+    implicit val loggedInBlogger = Some(req.user)
     Ok(views.html.changePassword(changePasswordForm))
   }
 
-  def changePassword = authenticated(parsers.anyContent) { implicit req =>
-    changePasswordForm.bindFromRequest.fold(
+  def changePassword = authenticated(parsers.anyContent) { implicit req: UserRequest[AnyContent] =>
+    implicit val loggedInBlogger = Some(req.user)
+
+    changePasswordForm.bindFromRequest().fold(
       formWithError => {
         logger.error("BloggerController.changePassword validation error: " + formWithError)
         BadRequest(

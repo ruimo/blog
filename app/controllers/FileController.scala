@@ -18,11 +18,8 @@ import java.io.{PipedInputStream, PipedOutputStream}
 
 import play.api.mvc.MultipartFormData
 import play.api.libs.streams.Accumulator
-import akka.stream.scaladsl.Sink
 import play.core.parsers.Multipart
 import play.api.http.HttpEntity
-import akka.stream.scaladsl.Source
-import akka.util.ByteString
 import play.api.Logger
 import play.api.data._
 import play.api.data.Forms._
@@ -37,24 +34,32 @@ import java.time.ZoneOffset.UTC
 
 import models._
 import helpers.Jdbc.{closeThrowingNothing, rollbackThrowing}
+import play.api.libs.Files.TemporaryFile
+import org.apache.pekko.stream.scaladsl.Source
+import org.apache.pekko.util.ByteString
+import org.apache.pekko.stream.scaladsl.Sink
+import play.api.db.Database
 
 @Singleton
 class FileController @Inject() (
   cc: ControllerComponents,
-  implicit val settings: Settings,
-  implicit val ec: ExecutionContext,
   dbApi: DBApi,
   parsers: PlayBodyParsers,
-  val bloggerRepo: BloggerRepo
-) extends AbstractController(cc) with I18nSupport with AuthenticatedSupport with TimeZoneSupport {
-  val db = dbApi.database("default")
+  implicit val bloggerRepo: BloggerRepo,
+  implicit val settings: Settings,
+  implicit val ec: ExecutionContext,
+) extends AbstractController(cc) with I18nSupport with TimeZoneSupport {
+  implicit val db: Database = dbApi.database("default")
   val logger = Logger(getClass)
+  val authenticated = new AuthenticatedActionBuilder(AuthenticatedActionBuilder.loginBlogger, parsers.anyContent)
 
-  def index(page: Int, pageSize: Int, orderBySpec: String) = authenticated(parsers.anyContent) { implicit req =>
+  def index(page: Int, pageSize: Int, orderBySpec: String) = authenticated(parsers.anyContent) { implicit req: UserRequest[AnyContent] =>
+    implicit val loggedInBlogger = Some(req.user)
     Ok(views.html.file(page, pageSize, orderBySpec))
   }
 
-  def fileList(page: Int, pageSize: Int, orderBySpec: String) = authenticated(parsers.anyContent) { implicit req =>
+  def fileList(page: Int, pageSize: Int, orderBySpec: String) = authenticated(parsers.anyContent) { implicit req: UserRequest[AnyContent] =>
+    implicit val loggedInBlogger = Some(req.user)
     db.withConnection { implicit conn =>
       Ok(
         views.html.fileList(
@@ -66,9 +71,9 @@ class FileController @Inject() (
     }
   }
 
-  def create() = authenticated(parse.multipartFormData) { implicit req =>
+  def create() = authenticated(parsers.multipartFormData) { implicit req: UserRequest[MultipartFormData[TemporaryFile]] =>
     db.withConnection { implicit conn =>
-      req.body.files.foreach { filePart =>
+      req.request.body.files.foreach { filePart =>
         val thumbnail = if (isImageFile(filePart)) {
           createThumbnail(filePart.ref.path)
         } else None
@@ -78,7 +83,7 @@ class FileController @Inject() (
     Ok("")
   }
 
-  def isImageFile(filePart: FilePart[_]): Boolean = filePart.contentType.map {
+  def isImageFile(filePart: FilePart[?]): Boolean = filePart.contentType.map {
     case "image/gif" => true
     case "image/jpeg" => true
     case "image/jpg" => true
@@ -92,7 +97,7 @@ class FileController @Inject() (
     val f: Path = Files.createTempFile(null, extention(file))
     val cmd = "convert -geometry " + maxWidth + "x" + maxHeight + " " + file.toAbsolutePath + " " + f.toAbsolutePath
     logger.info("Invoking [" + cmd + "]")
-    val rc = (Process(cmd) run) exitValue()
+    val rc = (Process(cmd) run).exitValue()
     if (rc == 0) {
       logger.info("[" + cmd + "] success")
       Some(f)
@@ -120,7 +125,7 @@ class FileController @Inject() (
 //    )
 //  }
 
-  def getImage(id: Long, thumbnail: Boolean) = Action { implicit req =>
+  def getImage(id: Long, thumbnail: Boolean) = Action { implicit req: Request[AnyContent] =>
     logger.info("getImage(" + id + ", " + thumbnail + ") called")
     db.withConnection { implicit conn =>
       Image.getImageSize(ImageId(id), thumbnail)
@@ -185,13 +190,14 @@ class FileController @Inject() (
     }
   }
 
-  def testGet = Action { implicit req =>
+  def testGet = Action { implicit req: Request[AnyContent] =>
+    implicit val loggedInBlogger: Option[LoginBlogger] = AuthenticatedActionBuilder.loginBlogger(req)(db, bloggerRepo)
     Ok(views.html.test())
   }
 
   def handleFilePartAsFile: Multipart.FilePartHandler[Long] = {
     val lock = new AnyRef
-    val conn: Connection = db.getConnection
+    val conn: Connection = db.getConnection()
     logger.info("Connection obtained. " + conn)
 
     fi => try {
@@ -218,7 +224,7 @@ insert into image(
         }
       }
 
-      Accumulator(sink).map { size: Long =>
+      Accumulator(sink).map { (size: Long) =>
         try {
           logger.info("Finalizing transaction.")
           buf.close()
@@ -257,16 +263,16 @@ insert into image(
     }
   }
 
-  def testPost = Action(parse.multipartFormData(handleFilePartAsFile)) { implicit req =>
+  def testPost = Action(parsers.multipartFormData(handleFilePartAsFile)) { implicit req: Request[MultipartFormData[Long]] =>
     val fileOption = req.body.file("file").map {
-      case fp@MultipartFormData.FilePart(key, filename, contentType, ref, size, dispType) =>
+      case fp@MultipartFormData.FilePart(key, filename, contentType, ref, size, dispType, refToBytes) =>
         logger.info("Upload completed " + fp + " size = " + size)
     }
 
     Ok("")
   }
 
-  def test() = Action { implicit req =>
+  def test() = Action { implicit req: Request[AnyContent] =>
     val res = Array(0L)
     val source = Source.unfoldResource[ByteString, Array[Long]](
       create = () => {

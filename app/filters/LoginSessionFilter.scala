@@ -1,10 +1,10 @@
 package filters
 
-import akka.stream.Materializer
 import javax.inject._
 import play.api.mvc._
 import scala.concurrent.{ExecutionContext, Future}
 import models.LoginSession
+import org.apache.pekko.stream.Materializer
 
 @Singleton
 class LoginSessionFilter @Inject()(

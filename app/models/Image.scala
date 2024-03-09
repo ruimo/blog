@@ -2,12 +2,13 @@ package models
 
 import java.time.Instant
 import java.io.{InputStream, FileInputStream}
-import com.ruimo.scoins.LoanPattern._
 import java.time.Instant
 import java.nio.file.Path
 import anorm._
 import java.sql.Connection
 import com.ruimo.scoins.ImmutableByteArray
+import java.sql.PreparedStatement
+import scala.util.Using
 
 case class ImageId(value: Long) extends AnyVal
 
@@ -33,7 +34,7 @@ object Image {
   def get(id: ImageId)(implicit conn: Connection): Option[Image] = SQL(
     "select * from image where image_id={id}"
   ).on(
-    'id -> id.value
+    "id" -> id.value
   ).as(
     simple.singleOpt
   )
@@ -46,10 +47,10 @@ object Image {
       select * from image order by $orderBy limit {pageSize} offset {offset}
       """
     ).on(
-      'pageSize -> pageSize,
-      'offset -> offset
+      "pageSize" -> pageSize,
+      "offset" -> offset
     ).as(
-      simple *
+      simple.*
     )
 
     val count = SQL(
@@ -62,16 +63,22 @@ object Image {
   def create(
     fileName: String, contentType: Option[String], body: Path, thumbnail: Option[Path], createdTime: Long = System.currentTimeMillis
   )(implicit conn: Connection): ImageId =
-    using(new FileInputStream(body.toFile)) { bodyIs =>
+    Using.resource(new FileInputStream(body.toFile)) { bodyIs =>
       thumbnail match {
         case Some(tf) =>
-          using(new FileInputStream(tf.toFile)) { thumIs =>
+          Using.resource(new FileInputStream(tf.toFile)) { thumIs =>
             create(fileName, contentType, bodyIs, Some(thumIs), createdTime)
-          }.get
+          }
         case None =>
           create(fileName, contentType, bodyIs, None, createdTime)
       }
-    }.get
+    }
+
+  implicit def inputStreamToStatement: ToStatement[InputStream] = new ToStatement[InputStream] {
+    def set(s: PreparedStatement, index: Int, aValue: InputStream): Unit = {
+      s.setBinaryStream(index, aValue)
+    }
+  }
 
   def create(
     fileName: String, contentType: Option[String], body: InputStream, thumbnail: Option[InputStream], createdTime: Long
@@ -86,11 +93,11 @@ object Image {
           )
           """
     ).on(
-      'fileName -> fileName,
-      'contentType -> contentType,
-      'body -> body,
-      'thumbnail -> thumbnail,
-      'createdTime -> Instant.ofEpochMilli(createdTime)
+      "fileName" -> fileName,
+      "contentType" -> contentType,
+      "body" -> body,
+      "thumbnail" -> thumbnail,
+      "createdTime" -> Instant.ofEpochMilli(createdTime)
     ).executeUpdate()
 
     ImageId(SQL("select currval('image_seq')").as(SqlParser.scalar[Long].single))
@@ -104,7 +111,7 @@ object Image {
       select file_name, content_type, LENGTH($col) len from image where image_id={id}
       """
     ).on(
-      'id -> id.value
+      "id" -> id.value
     ).as(
       SqlParser.get[Option[Long]]("len") ~ SqlParser.str("file_name") ~ SqlParser.get[Option[String]]("content_type") map (SqlParser.flatten) singleOpt
     )
@@ -121,7 +128,7 @@ object Image {
       limit 1
       """
     ).on(
-      'articleId -> id.value
+      "articleId" -> id.value
     ).as(
       SqlParser.scalar[Long].singleOpt
     ).map(ImageId.apply)

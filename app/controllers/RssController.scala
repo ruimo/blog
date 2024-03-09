@@ -1,6 +1,5 @@
 package controllers
 
-import akka.util.ByteString
 import play.twirl.api.Xml
 import play.api.libs.json.{JsString, Json}
 import play.api.data._
@@ -19,6 +18,7 @@ import play.api.i18n.{I18nSupport, Messages => msg}
 import play.api.http.Writeable
 
 import scala.concurrent.ExecutionContext
+import org.apache.pekko.util.ByteString
 
 @Singleton
 class RssController @Inject()(
@@ -27,7 +27,7 @@ class RssController @Inject()(
   dbApi: DBApi,
   val bloggerRepo: BloggerRepo,
   settings: Settings
-) extends AbstractController(cc) with I18nSupport with AuthenticatedSupport with TimeZoneSupport {
+) extends AbstractController(cc) with I18nSupport with TimeZoneSupport {
   val db = dbApi.database("default")
 
   val xmlWriteable = new Writeable[Xml](
@@ -35,7 +35,7 @@ class RssController @Inject()(
     Some("text/xml")
   )
 
-  def atom(page: Int, pageSize: Int, orderBySpec: String, now: Long) = Action { implicit req =>
+  def atom(page: Int, pageSize: Int, orderBySpec: String, now: Long) = Action { implicit req: Request[AnyContent] =>
     db.withConnection { implicit conn =>
       val recs: PagedRecords[Article] = Article.list(page, pageSize, OrderBy(orderBySpec), now)
       Ok(
