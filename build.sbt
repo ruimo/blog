@@ -24,6 +24,6 @@ libraryDependencies ++= Seq(
   specs2 % Test
 )
 
-fork in Test := true
-parallelExecution in Test := false
+Test / fork := true
+Test / parallelExecution := false
 publish / skip := true
